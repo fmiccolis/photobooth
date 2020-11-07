@@ -250,15 +250,19 @@ const photoBooth = (function () {
         $('#counter').empty();
         $('.cheese').empty();
 
-        if (photoStyle === 'photo') {
-            const cheesemsg = i18n('cheese');
-            $('.cheese').text(cheesemsg);
+        if (config.no_cheese) {
+            console.log('Cheese is disabled.');
         } else {
-            const cheesemsg = i18n('cheeseCollage');
-            $('.cheese').text(cheesemsg);
-            $('<p>')
-                .text(`${nextCollageNumber + 1} / ${config.collage_limit}`)
-                .appendTo('.cheese');
+            if (photoStyle === 'photo') {
+                const cheesemsg = i18n('cheese');
+                $('.cheese').text(cheesemsg);
+            } else {
+                const cheesemsg = i18n('cheeseCollage');
+                $('.cheese').text(cheesemsg);
+                $('<p>')
+                    .text(`${nextCollageNumber + 1} / ${config.collage_limit}`)
+                    .appendTo('.cheese');
+            }
         }
 
         if (config.previewFromCam && config.previewCamTakesPic && !api.stream && !config.dev) {
@@ -273,9 +277,13 @@ const photoBooth = (function () {
                 error: 'No preview by device cam available!'
             });
         } else {
-            setTimeout(() => {
+            if (config.no_cheese) {
                 api.takePic(photoStyle);
-            }, config.cheese_time);
+            } else {
+                setTimeout(() => {
+                    api.takePic(photoStyle);
+                }, config.cheese_time);
+            }
         }
     };
 
