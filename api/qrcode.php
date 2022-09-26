@@ -34,4 +34,13 @@ switch ($config['qr']['ecLevel']) {
         break;
 }
 
-QRcode::png($url, false, $ecLevel, 8);
+try {
+    QRcode::png($url, false, $ecLevel, 8);
+} catch (Exception $exception) {
+    if ($config['qr']['append_filename']) {
+        $url = $config['qr']['url'] . $filename;
+    } else {
+        $url = $config['qr']['url'];
+    }
+    QRcode::png($url, false, $ecLevel, 8);
+}
