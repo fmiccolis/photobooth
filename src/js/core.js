@@ -636,7 +636,13 @@ const photoBooth = (function () {
             .append($('<i>').addClass('fa fa-times'))
             .css('float', 'right')
             .appendTo(body);
-        $('<img src="api/qrcode.php?filename=' + filename + '&link=' + customQrlink + '" alt="qr code"/>')
+        $(
+            '<img src="api/qrcode.php?filename=' +
+                filename +
+                '&link=' +
+                (customQrlink ? customQrlink : '') +
+                '" alt="qr code"/>'
+        )
             .on('load', function () {
                 $('<p>')
                     .css('max-width', this.width + 'px')
