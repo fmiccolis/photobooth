@@ -293,6 +293,18 @@ $config['get_request']['picture'] = 'CNTDWNPHOTO';
 $config['get_request']['collage'] = 'CNTDWNCOLLAGE';
 
 
+// FTP
+$config['ftp']['enabled'] = false;
+$config['ftp']['baseURL'] = '';
+$config['ftp']['port'] = 21;
+$config['ftp']['username'] = '';
+$config['ftp']['password'] = '';
+$config['ftp']['folder'] = '';
+$config['ftp']['appendDate'] = false;
+$config['ftp']['useForQr'] = false;
+$config['ftp']['website'] = '';
+
+
 // A U T H E N T I C A T I O N
 $config['login']['enabled'] = false;
 $config['login']['username'] = 'Photo';
