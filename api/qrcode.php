@@ -3,7 +3,7 @@ require_once '../lib/config.php';
 require_once '../lib/helper.php';
 
 $filename = $_GET['filename'];
-$link = $_GET['link'];
+$link = urldecode($_GET['link']);
 
 if ($link != '') {
     $url = $link;

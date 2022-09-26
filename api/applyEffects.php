@@ -143,7 +143,11 @@ foreach ($srcImages as $image) {
 
         if (ftp_put($ftp, $image, $filename_photo, FTP_BINARY)) {
             if ($config['ftp']['useForQr']) {
-                $qr_link = $config['ftp']['website'] . $config['ftp']['folder'] . DIRECTORY_SEPARATOR . $image;
+                if ($config['ftp']['website'] != '') {
+                    $qr_link = $config['ftp']['website'] . $destination . DIRECTORY_SEPARATOR . $image;
+                } else {
+                    $qr_link = substr($destination . DIRECTORY_SEPARATOR . $image, 1);
+                }
             }
         } else {
             logErrorAndDie('Unable to save file on FTP Server!');
@@ -168,7 +172,7 @@ $LogData = [
     'php' => basename($_SERVER['PHP_SELF']),
 ];
 if ($qr_link != '') {
-    $LogData['qr_link'] = $qr_link;
+    $LogData['qr_link'] = urlencode($qr_link);
 }
 $LogString = json_encode($LogData);
 if ($config['dev']['loglevel'] > 1) {
