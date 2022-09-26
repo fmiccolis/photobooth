@@ -3,11 +3,16 @@ require_once '../lib/config.php';
 require_once '../lib/helper.php';
 
 $filename = $_GET['filename'];
+$link = $_GET['link'];
 
-if ($config['qr']['append_filename']) {
-    $url = $config['qr']['url'] . $filename;
+if ($link != "") {
+    $url = $link;
 } else {
-    $url = $config['qr']['url'];
+    if ($config['qr']['append_filename']) {
+        $url = $config['qr']['url'] . $filename;
+    } else {
+        $url = $config['qr']['url'];
+    }
 }
 
 include '../vendor/phpqrcode/lib/full/qrlib.php';
