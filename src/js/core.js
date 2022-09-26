@@ -674,7 +674,7 @@ const photoBooth = (function () {
             .append('<i class="' + config.icons.close + '"></i>')
             .css('float', 'right')
             .appendTo(body);
-        photoboothTools.console.logDev(
+        photoboothTools.console.log(
             'api/qrcode.php?filename=' + filename + '&link=' + (customQrlink ? customQrlink : '')
         );
         $(
