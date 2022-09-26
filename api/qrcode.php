@@ -3,9 +3,9 @@ require_once '../lib/config.php';
 require_once '../lib/helper.php';
 
 $filename = $_GET['filename'];
-$link = urldecode($_GET['link']);
+$link = $_GET['link'];
 
-if ($link != "") {
+if ($link != '') {
     $url = $link;
 } else {
     if ($config['qr']['append_filename']) {
@@ -34,13 +34,4 @@ switch ($config['qr']['ecLevel']) {
         break;
 }
 
-try {
-    QRcode::png($url, false, $ecLevel, 8);
-} catch (Exception $exception) {
-    if ($config['qr']['append_filename']) {
-        $url = $config['qr']['url'] . $filename;
-    } else {
-        $url = $config['qr']['url'];
-    }
-    QRcode::png($url, false, $ecLevel, 8);
-}
+QRcode::png($url, false, $ecLevel, 8);
