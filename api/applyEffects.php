@@ -175,6 +175,7 @@ if ($qr_link != '') {
     $LogData['qr_link'] = urlencode($qr_link);
 }
 $LogString = json_encode($LogData);
+logError($LogString);
 if ($config['dev']['loglevel'] > 1) {
     logError($LogData);
 }
