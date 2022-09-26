@@ -53,6 +53,7 @@ if ($_POST['style'] === 'collage') {
 
 $srcImages = [];
 $srcImages[] = $file;
+$qr_link = '';
 
 $filename_tmp = $config['foldersAbs']['tmp'] . DIRECTORY_SEPARATOR . $file;
 
@@ -122,6 +123,35 @@ foreach ($srcImages as $image) {
         }
     }
 
+    // send to ftp server
+    if ($config['ftp']['enabled']) {
+        $ftp = ftp_ssl_connect($config['ftp']['baseURL'], $config['ftp']['port']);
+        $login_result = ftp_login($ftp, $config['ftp']['username'], $config['ftp']['password']);
+
+        if (!$login_result) {
+            logErrorAndDie("Can't connect to FTP Server!");
+        }
+
+        ftp_pasv($ftp, true);
+
+        $destination = $config['ftp']['folder'];
+        if ($config['ftp']['appendDate']) {
+            $destination .= DIRECTORY_SEPARATOR . date('Y/m/d');
+        }
+
+        cdFTPTree($ftp, $destination);
+
+        if (ftp_put($ftp, $image, $filename_photo, FTP_BINARY)) {
+            if ($config['ftp']['useForQr']) {
+                $qr_link = $config['ftp']['website'] . $config['ftp']['folder'] . DIRECTORY_SEPARATOR . $image;
+            }
+        } else {
+            logErrorAndDie('Unable to save file on FTP Server!');
+        }
+
+        ftp_close($ftp);
+    }
+
     // Change permissions
     $picture_permissions = $config['picture']['permissions'];
     chmod($filename_photo, octdec($picture_permissions));
@@ -137,6 +167,9 @@ $LogData = [
     'images' => $srcImages,
     'php' => basename($_SERVER['PHP_SELF']),
 ];
+if ($qr_link != '') {
+    $LogData['qr_link'] = $qr_link;
+}
 $LogString = json_encode($LogData);
 if ($config['dev']['loglevel'] > 1) {
     logError($LogData);
