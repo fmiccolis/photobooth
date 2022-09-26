@@ -777,7 +777,7 @@ const photoBooth = (function () {
                 } else if (photoStyle === PhotoStyle.CHROMA) {
                     api.renderChroma(data.file);
                 } else {
-                    api.renderPic(data.file, data.images);
+                    api.renderPic(data.file, data.images, data.qr_link);
                 }
             },
             error: (jqXHR, textStatus) => {
@@ -816,7 +816,7 @@ const photoBooth = (function () {
         api.resetTimeOut();
     };
 
-    api.renderPic = function (filename, files) {
+    api.renderPic = function (filename, files, customQrlink) {
         const qrHelpText = config.qr.custom_text
             ? config.qr.text
             : photoboothTools.getTranslation('qrHelp') + '</br><b>' + config.webserver.ssid + '</b>';
@@ -832,7 +832,7 @@ const photoBooth = (function () {
             .append($('<i>').addClass('fa fa-times'))
             .css('float', 'right')
             .appendTo(body);
-        $('<img src="api/qrcode.php?filename=' + filename + '" alt="qr code"/>')
+        $('<img src="api/qrcode.php?filename=' + filename + '&link=' + customQrlink + '" alt="qr code"/>')
             .on('load', function () {
                 $('<p>')
                     .css('max-width', this.width + 'px')
