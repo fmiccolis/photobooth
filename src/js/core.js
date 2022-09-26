@@ -636,6 +636,9 @@ const photoBooth = (function () {
             .append($('<i>').addClass('fa fa-times'))
             .css('float', 'right')
             .appendTo(body);
+        photoboothTools.console.logDev(
+            'api/qrcode.php?filename=' + filename + '&link=' + (customQrlink ? customQrlink : '')
+        );
         $(
             '<img src="api/qrcode.php?filename=' +
                 filename +
