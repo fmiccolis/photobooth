@@ -173,6 +173,13 @@ const photoBooth = (function () {
             idVideoView.css('z-index', 99);
         }
         idVideoView.show();
+        const videoWidth = idVideoView.videoWidth,
+            videoHeight = idVideoView.videoHeight;
+        console.log(videoWidth + ' - ' + videoHeight);
+        idPictureFrame.css('width', videoWidth + 'px');
+        idPictureFrame.css('height', videoHeight + 'px');
+        idCollageFrame.css('width', videoWidth + 'px');
+        idCollageFrame.css('height', videoHeight + 'px');
     };
 
     api.initializeMedia = function (cb = () => {}, retry = 0) {
