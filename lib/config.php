@@ -22,10 +22,6 @@ $cmds = [
             'cmd' => '',
             'msg' => '',
         ],
-        'preview' => [
-            'cmd' => '',
-            'killcmd' => '',
-        ],
         'nodebin' => [
             'cmd' => '',
         ],
@@ -48,10 +44,6 @@ $cmds = [
         'exiftool' => [
             'cmd' => 'exiftool -overwrite_original -TagsFromFile %s %s',
             'msg' => '',
-        ],
-        'preview' => [
-            'cmd' => 'gphoto2 --stdout --capture-movie | ffmpeg -i - -vcodec rawvideo -pix_fmt yuv420p -threads 0 -f v4l2 /dev/video0 > /dev/null 2>&1 & echo $!',
-            'killcmd' => 'killall gphoto2 && sleep 1',
         ],
         'nodebin' => [
             'cmd' => '/usr/bin/node',
@@ -100,8 +92,6 @@ $config['print']['cmd'] = $cmds[SERVER_OS]['print']['cmd'];
 $config['print']['msg'] = $cmds[SERVER_OS]['print']['msg'];
 $config['exiftool']['cmd'] = $cmds[SERVER_OS]['exiftool']['cmd'];
 $config['exiftool']['msg'] = $cmds[SERVER_OS]['exiftool']['msg'];
-$config['preview']['cmd'] = $cmds[SERVER_OS]['preview']['cmd'];
-$config['preview']['killcmd'] = $cmds[SERVER_OS]['preview']['killcmd'];
 $config['nodebin']['cmd'] = $cmds[SERVER_OS]['nodebin']['cmd'];
 $config['reboot']['cmd'] = $cmds[SERVER_OS]['reboot']['cmd'];
 $config['shutdown']['cmd'] = $cmds[SERVER_OS]['shutdown']['cmd'];
@@ -178,6 +168,10 @@ foreach ($config['folders'] as $key => $folder) {
     $config['foldersAbs'][$key] = $path;
 }
 
+if ($config['preview']['mode'] === 'gphoto') {
+    $config['preview']['mode'] = 'device_cam';
+}
+
 $default_font = realpath($basepath . DIRECTORY_SEPARATOR . 'resources/fonts/GreatVibes-Regular.ttf');
 $default_frame = realpath($basepath . DIRECTORY_SEPARATOR . 'resources/img/frames/frame.png');
 
@@ -230,6 +224,16 @@ if (empty($config['background']['admin'])) {
 
 if (empty($config['background']['chroma'])) {
     $config['background']['chroma'] = 'url(' . $bg_url . ')';
+}
+
+if (!empty($config['picture']['frame'])) {
+    $pf_root = getrootpath($config['picture']['frame']);
+    $config['picture']['htmlframe'] = fixSeperator($pf_root);
+}
+
+if (!empty($config['collage']['frame'])) {
+    $cf_root = getrootpath($config['collage']['frame']);
+    $config['collage']['htmlframe'] = fixSeperator($cf_root);
 }
 
 if (empty($config['webserver']['ip'])) {

@@ -1020,14 +1020,13 @@ $configsetup = [
                 'none' => 'None',
                 'device_cam' => 'from device cam',
                 'url' => 'from URL',
-                'gphoto' => 'from gphoto2',
             ],
             'value' => $config['preview']['mode'],
         ],
-        'preview_gphoto_bsm' => [
+        'preview_bsm' => [
             'type' => 'checkbox',
-            'name' => 'preview[gphoto_bsm]',
-            'value' => $config['preview']['gphoto_bsm'],
+            'name' => 'preview[bsm]',
+            'value' => $config['preview']['bsm'],
         ],
         'preview_stop_time' => [
             'type' => 'range',
@@ -2180,7 +2179,7 @@ $configsetup = [
         'preview_cmd' => [
             'view' => 'expert',
             'type' => 'input',
-            'placeholder' => $defaultConfig['preview']['cmd'],
+            'placeholder' => 'python3 cameracontrol.py --bsm',
             'name' => 'preview[cmd]',
             'value' => htmlentities($config['preview']['cmd'] ?? ''),
         ],
