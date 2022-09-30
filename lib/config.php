@@ -245,13 +245,3 @@ if (empty($config['qr']['url'])) {
 }
 
 $config['photobooth']['version'] = getPhotoboothVersion();
-
-if (!empty($config['picture']['frame'])) {
-    $pf_root = getrootpath($config['picture']['frame']);
-    $config['picture']['htmlframe'] = fixSeperator($pf_root);
-}
-
-if (!empty($config['collage']['frame'])) {
-    $cf_root = getrootpath($config['collage']['frame']);
-    $config['collage']['htmlframe'] = fixSeperator($cf_root);
-}
