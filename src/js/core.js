@@ -173,13 +173,6 @@ const photoBooth = (function () {
             idVideoView.css('z-index', 99);
         }
         idVideoView.show();
-        const videoWidth = idVideoView.videoWidth,
-            videoHeight = idVideoView.videoHeight;
-        console.log(videoWidth + ' - ' + videoHeight);
-        idPictureFrame.css('width', videoWidth + 'px');
-        idPictureFrame.css('height', videoHeight + 'px');
-        idCollageFrame.css('width', videoWidth + 'px');
-        idCollageFrame.css('height', videoHeight + 'px');
     };
 
     api.initializeMedia = function (cb = () => {}, retry = 0) {
@@ -1421,6 +1414,14 @@ const photoBooth = (function () {
             e.preventDefault();
         });
     }
+
+    idVideoView.on("loadedmetadata", function(ev) {
+        let videoEl = ev.target;
+        idPictureFrame.css("width", videoEl.videoWidth);
+        idPictureFrame.css("height", videoEl.videoHeight);
+        idCollageFrame.css("width", videoEl.videoWidth);
+        idCollageFrame.css("height", videoEl.videoHeight);
+    });
 
     return api;
 })();
