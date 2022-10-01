@@ -16,6 +16,13 @@ const photoBooth = (function () {
             DEVICE: 'device_cam',
             URL: 'url'
         },
+        PreviewStyle = {
+            FILL: 'fill',
+            CONTAIN: 'contain',
+            COVER: 'cover',
+            NONE: 'none',
+            SCALE_DOWN: 'scale-down'
+        },
         CollageFrameMode = {
             OFF: 'off',
             ALWAYS: 'always',
@@ -1416,11 +1423,17 @@ const photoBooth = (function () {
     }
 
     idVideoView.on("loadedmetadata", function(ev) {
-        let videoEl = ev.target;
-        idPictureFrame.css("width", videoEl.videoWidth);
-        idPictureFrame.css("height", videoEl.videoHeight);
-        idCollageFrame.css("width", videoEl.videoWidth);
-        idCollageFrame.css("height", videoEl.videoHeight);
+        const videoEl = ev.target;
+        let newWidth = videoEl.offsetWidth;
+        let newHeight = videoEl.offsetHeight;
+        if(config.preview.style === PreviewStyle.SCALE_DOWN) {
+            newWidth = videoEl.videoWidth;
+            newHeight = videoEl.videoHeight;
+        }
+        idPictureFrame.css("width", newWidth);
+        idPictureFrame.css("height", newHeight);
+        idCollageFrame.css("width", newWidth);
+        idCollageFrame.css("height", newHeight);
     });
 
     return api;
