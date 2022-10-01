@@ -53,7 +53,6 @@ if ($_POST['style'] === 'collage') {
 
 $srcImages = [];
 $srcImages[] = $file;
-$qr_link = "";
 
 $filename_tmp = $config['foldersAbs']['tmp'] . DIRECTORY_SEPARATOR . $file;
 
@@ -125,13 +124,17 @@ foreach ($srcImages as $image) {
 
     // send to ftp server
     if ($config['ftp']['enabled']) {
+        // init connection to ftp server
         $ftp = ftp_ssl_connect($config['ftp']['baseURL'], $config['ftp']['port']);
+
+        // login to ftp server
         $login_result = ftp_login($ftp, $config['ftp']['username'], $config['ftp']['password']);
 
         if (!$login_result) {
             logErrorAndDie("Can't connect to FTP Server!");
         }
 
+        // turn passive mode on to enable creation of folder and upload of files
         ftp_pasv($ftp, true);
 
         $destination = $config['ftp']['folder'];
@@ -139,20 +142,17 @@ foreach ($srcImages as $image) {
             $destination .= DIRECTORY_SEPARATOR . date("Y/m/d");
         }
 
+        // navigate trough folder on the server to the destination
         cdFTPTree($ftp, $destination);
 
-        if (ftp_put($ftp, $image, $filename_photo, FTP_BINARY)) {
-            if ($config['ftp']['useForQr']) {
-                if ($config['ftp']['website'] != "") {
-                    $qr_link = $config['ftp']['website'] . $destination . DIRECTORY_SEPARATOR . $image;
-                } else {
-                    $qr_link = substr($destination . DIRECTORY_SEPARATOR . $image, 1);
-                }
-            }
-        } else {
+        // upload processed picture into destination folder
+        $put_result = ftp_put($ftp, $image, $filename_photo, FTP_BINARY);
+
+        if (!$put_result) {
             logErrorAndDie("Unable to save file on FTP Server!");
         }
 
+        // close the connection
         ftp_close($ftp);
     }
 
@@ -171,11 +171,8 @@ $LogData = [
     'images' => $srcImages,
     'php' => basename($_SERVER['PHP_SELF']),
 ];
-if ($qr_link != "") {
-    $LogData['qr_link'] = urlencode($qr_link);
-}
+
 $LogString = json_encode($LogData);
-logError($LogString);
 if ($config['dev']['loglevel'] > 1) {
     logError($LogData);
 }
