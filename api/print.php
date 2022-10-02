@@ -75,7 +75,18 @@ if (!file_exists($filename_print)) {
     if ($config['print']['qrcode'] && file_exists('../vendor/phpqrcode/lib/full/qrlib.php')) {
         // create qr code
         if (!file_exists($filename_codes)) {
-            if ($config['qr']['append_filename']) {
+            if ($config['ftp']['enabled'] && $config['ftp']['useForQr']) {
+                $destination = $config['ftp']['folder'];
+                if ($config['ftp']['appendDate']) {
+                    $destination .= DIRECTORY_SEPARATOR . date('Y/m/d');
+                }
+
+                if ($config['ftp']['website'] != '') {
+                    $url = $config['ftp']['website'] . $destination . DIRECTORY_SEPARATOR . $filename;
+                } else {
+                    $url = substr($destination . DIRECTORY_SEPARATOR . $filename, 1);
+                }
+            } elseif ($config['qr']['append_filename']) {
                 $url = $config['qr']['url'] . $filename;
             } else {
                 $url = $config['qr']['url'];
