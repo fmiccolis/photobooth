@@ -174,6 +174,7 @@ if ($config['preview']['mode'] === 'gphoto') {
 
 $default_font = realpath($basepath . DIRECTORY_SEPARATOR . 'resources/fonts/GreatVibes-Regular.ttf');
 $default_frame = realpath($basepath . DIRECTORY_SEPARATOR . 'resources/img/frames/frame.png');
+$default_template = realpath($basepath . DIRECTORY_SEPARATOR . 'resources/template/index.php');
 
 if (empty($config['picture']['frame']) || !testFile($config['picture']['frame'])) {
     $config['picture']['frame'] = $default_frame;
@@ -232,6 +233,10 @@ if (empty($config['webserver']['ip'])) {
 
 if (empty($config['qr']['url'])) {
     $config['qr']['url'] = getPhotoboothUrl() . '/api/download.php?image=';
+}
+
+if (empty($config['ftp']['template_location']) || !testFile($config['ftp']['template_location'])) {
+    $config['ftp']['template_location'] = $default_template;
 }
 
 $config['photobooth']['version'] = getPhotoboothVersion();

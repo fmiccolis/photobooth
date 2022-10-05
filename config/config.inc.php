@@ -300,9 +300,13 @@ $config['ftp']['port'] = 21;
 $config['ftp']['username'] = '';
 $config['ftp']['password'] = '';
 $config['ftp']['folder'] = '';
+$config['ftp']['title'] = '';
 $config['ftp']['appendDate'] = false;
 $config['ftp']['useForQr'] = false;
 $config['ftp']['website'] = '';
+$config['ftp']['create_webpage'] = false;
+$config['ftp']['template_location'] = '';
+$config['ftp']['upload_thumb'] = false;
 
 
 // A U T H E N T I C A T I O N
