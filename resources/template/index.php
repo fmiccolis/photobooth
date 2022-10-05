@@ -61,8 +61,7 @@ $og_img_alt = 'Horsebooth'
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                padding: 2em;
-                background: white;
+                background-color: transparent;
                 border-radius: 1rem;
                 background-size: contain;
                 background-repeat: no-repeat;
@@ -78,6 +77,10 @@ $og_img_alt = 'Horsebooth'
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
+            }
+
+            .action-bar > a {
+                margin: 0 1rem;
             }
 
             /* Demo Styles */
@@ -156,10 +159,10 @@ $og_img_alt = 'Horsebooth'
                     </div>
                 </div>
                 <div id="open-modal<?=$index?>" class="modal-window">
-                    <div class="modal-content" style="background: url('<?=$this_full?>')">
+                    <div class="modal-content" style="background-image: url('<?=$this_full?>')">
                         <div class="action-bar">
-                            <a href="#opener<?=$index?>" title="Close"><i class="fa-solid fa-xmark"></i></a>
                             <a href='<?=$this_full?>' class="image-element" download='<?=$og_img_alt?>_<?=$download_name?>'><i class="fa-solid fa-download"></i></a>
+                            <a href="#opener<?=$index?>" title="Close"><i class="fa-solid fa-xmark"></i></a>
                         </div>
                     </div>
                 </div>
