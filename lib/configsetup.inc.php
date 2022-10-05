@@ -1833,9 +1833,16 @@ $configsetup = [
         'folder' => [
             'view' => 'advanced',
             'type' => 'input',
-            'placeholder' => '',
+            'placeholder' => '/photobooth',
             'name' => 'ftp[folder]',
             'value' => htmlentities($config['ftp']['folder'] ?? ''),
+        ],
+        'title' => [
+            'view' => 'advanced',
+            'type' => 'input',
+            'placeholder' => '',
+            'name' => 'ftp[title]',
+            'value' => htmlentities($config['ftp']['title'] ?? ''),
         ],
         'appendDate' => [
             'view' => 'basic',
@@ -1855,6 +1862,25 @@ $configsetup = [
             'placeholder' => 'https://photobooth.com',
             'name' => 'ftp[website]',
             'value' => htmlentities($config['ftp']['website'] ?? ''),
+        ],
+        'create_webpage' => [
+            'view' => 'basic',
+            'type' => 'checkbox',
+            'name' => 'ftp[create_webpage]',
+            'value' => $config['ftp']['create_webpage'],
+        ],
+        'template_location' => [
+            'view' => 'advanced',
+            'type' => 'input',
+            'placeholder' => '/resources/template/index.php',
+            'name' => 'ftp[template_location]',
+            'value' => htmlentities($config['ftp']['template_location'] ?? ''),
+        ],
+        'upload_thumb' => [
+            'view' => 'basic',
+            'type' => 'checkbox',
+            'name' => 'ftp[upload_thumb]',
+            'value' => $config['ftp']['upload_thumb'],
         ],
     ],
     'authentication' => [
