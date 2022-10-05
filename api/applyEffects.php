@@ -172,7 +172,7 @@ foreach ($srcImages as $image) {
             $webpage_exist = ftp_size($ftp, 'index.php');
             if ($webpage_exist == -1) {
                 // get the index.php template file from the configured location
-                $webpage_template = file_get_contents($config['ftp']['webpage_location']);
+                $webpage_template = file_get_contents($config['ftp']['template_location']);
 
                 // set the {title} variable
                 $final_webpage = str_replace('{title}', $config['ftp']['title'], $webpage_template);
