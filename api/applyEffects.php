@@ -162,7 +162,7 @@ foreach ($srcImages as $image) {
         }
 
         // check if the webpage is enabled and is not already loaded on the ftp server
-        if ($config['ftp']['create_webpage'] && !isset($_SESSION['ftpWebpageLoaded'])) {
+        if ($config['ftp']['create_webpage'] && (!isset($_SESSION['ftpWebpageLoaded']) || $_SESSION['ftpWebpageLoaded'] != $config['ftp']['title'])) {
             // if the date folder structure is appended, return to the main folder
             if ($config['ftp']['appendDate']) {
                 @cdFTPTree($ftp, '../../../');
@@ -192,7 +192,7 @@ foreach ($srcImages as $image) {
                 }
 
                 // update the session variable to avoid unnecessary checks
-                $_SESSION['ftpWebpageLoaded'] = true;
+                $_SESSION['ftpWebpageLoaded'] = $config['ftp']['title'];
             }
         }
 
