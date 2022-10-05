@@ -137,19 +137,63 @@ foreach ($srcImages as $image) {
         // turn passive mode on to enable creation of folder and upload of files
         ftp_pasv($ftp, true);
 
-        $destination = $config['ftp']['folder'];
+        $destination = $config['ftp']['folder'] . DIRECTORY_SEPARATOR . slugify($config['ftp']['title']);
         if ($config['ftp']['appendDate']) {
             $destination .= DIRECTORY_SEPARATOR . date('Y/m/d');
         }
 
         // navigate trough folder on the server to the destination
-        cdFTPTree($ftp, $destination);
+        @cdFTPTree($ftp, $destination);
 
         // upload processed picture into destination folder
         $put_result = ftp_put($ftp, $image, $filename_photo, FTP_BINARY);
 
         if (!$put_result) {
             logErrorAndDie('Unable to save file on FTP Server!');
+        }
+
+        // upload the thumbnail if enabled
+        if ($config['ftp']['upload_thumb']) {
+            $thumb_result = ftp_put($ftp, 'tmb_' . $image, $filename_thumb, FTP_BINARY);
+
+            if (!$thumb_result) {
+                logError('Unable to load the thumbnail');
+            }
+        }
+
+        // check if the webpage is enabled and is not already loaded on the ftp server
+        if ($config['ftp']['create_webpage'] && !isset($_SESSION['ftpWebpageLoaded'])) {
+            // if the date folder structure is appended, return to the main folder
+            if ($config['ftp']['appendDate']) {
+                @cdFTPTree($ftp, '../../../');
+            }
+
+            // another security check on the file in the server (e.g. 2-day event with the same ftp folder location)
+            $webpage_exist = ftp_size($ftp, 'index.php');
+            if ($webpage_exist == -1) {
+                // get the index.php template file from the configured location
+                $webpage_template = file_get_contents($config['ftp']['webpage_location']);
+
+                // set the {title} variable
+                $final_webpage = str_replace('{title}', $config['ftp']['title'], $webpage_template);
+
+                // put the file into a stream
+                $stream = fopen('php://memory', 'r+');
+                fwrite($stream, $final_webpage);
+                rewind($stream);
+
+                // load the index.php result file in the ftp server
+                $upload_webpage = ftp_fput($ftp, 'index.php', $stream, FTP_BINARY);
+
+                fclose($stream);
+
+                if (!$upload_webpage) {
+                    logErrorAndDie('Unable to save file on FTP Server!');
+                }
+
+                // update the session variable to avoid unnecessary checks
+                $_SESSION['ftpWebpageLoaded'] = true;
+            }
         }
 
         // close the connection
