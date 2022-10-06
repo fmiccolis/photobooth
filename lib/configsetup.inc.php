@@ -1882,6 +1882,12 @@ $configsetup = [
             'name' => 'ftp[upload_thumb]',
             'value' => $config['ftp']['upload_thumb'],
         ],
+        'delete' => [
+            'view' => 'basic',
+            'type' => 'checkbox',
+            'name' => 'ftp[delete]',
+            'value' => $config['ftp']['delete'],
+        ],
     ],
     'authentication' => [
         'view' => 'basic',
