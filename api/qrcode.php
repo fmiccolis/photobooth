@@ -5,9 +5,9 @@ require_once '../lib/helper.php';
 $filename = $_GET['filename'];
 
 if ($config['ftp']['enabled'] && $config['ftp']['useForQr']) {
-    $destination = $config['ftp']['folder'];
+    $destination = $config['ftp']['folder'] . DIRECTORY_SEPARATOR . slugify($config['ftp']['title']);
     if ($config['ftp']['appendDate']) {
-        $destination .= DIRECTORY_SEPARATOR . date('Y/m/d');
+        $destination .= DIRECTORY_SEPARATOR . date("Y/m/d");
     }
 
     if ($config['ftp']['website'] != '') {
