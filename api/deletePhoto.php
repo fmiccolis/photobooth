@@ -41,6 +41,40 @@ if ($config['database']['enabled']) {
     deleteImageFromDB($file);
 }
 
+if ($config['ftp']['enabled'] && $config['ftp']['delete']) {
+    $ftp = ftp_ssl_connect($config['ftp']['baseURL'], $config['ftp']['port']);
+
+    // login to ftp server
+    $login_result = ftp_login($ftp, $config['ftp']['username'], $config['ftp']['password']);
+
+    if (!$login_result) {
+        logErrorAndDie("Can't connect to FTP Server!");
+    }
+
+    $remote_dest = $config['ftp']['folder'] . DIRECTORY_SEPARATOR . slugify($config['ftp']['title']);
+    if ($config['ftp']['appendDate']) {
+        $remote_dest .= DIRECTORY_SEPARATOR . date('Y/m/d');
+    }
+
+    $remote_file = $remote_dest . DIRECTORY_SEPARATOR . $file;
+
+    $delete_result = ftp_delete($ftp, $remote_file);
+
+    if (!$delete_result) {
+        logError('Unable to delete file on ftp server ' . $file);
+    }
+
+    if ($config['ftp']['upload_thumb']) {
+        $remote_file = $remote_dest . DIRECTORY_SEPARATOR . 'tmb_' . $file;
+
+        $delete_result = ftp_delete($ftp, $remote_file);
+
+        if (!$delete_result) {
+            logError('Unable to delete file on ftp server ' . $file);
+        }
+    }
+}
+
 echo json_encode([
     'success' => true,
 ]);
