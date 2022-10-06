@@ -8,7 +8,8 @@ $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https"
 $og_locale = 'it_IT';
 $og_description = 'Prenota l\'horse booth di cavallo production per riempire la tua festa di foto e di divertimento! Visita il nostro sito o contattaci!';
 $og_sitename = 'Cavallo Production';
-$og_img_alt = 'Horsebooth'
+$og_img_alt = 'Horsebooth';
+$whatsapp_msg = "Guarda questa foto scattata dall'Horsebooth! \n\n %s \n\n\n\n Prenota anche tu l'Horsebooth allo 0801234567";
 ?>
 
 <!DOCTYPE html>
@@ -68,11 +69,16 @@ $og_img_alt = 'Horsebooth'
                 background-position: center;
             }
 
-            .action-bar {
+            .action-bar-outer {
                 position: absolute;
                 width: 100%;
                 height: 10vh;
                 background-color: rgba(33, 33, 33, 0.90);
+                text-align: center;
+            }
+
+            .action-bar {
+                max-width: 30vw;
                 color: white;
                 display: flex;
                 align-items: center;
@@ -86,7 +92,7 @@ $og_img_alt = 'Horsebooth'
             /* Demo Styles */
             html,
             body {
-                height: 100%;
+                margin: 0;
             }
 
             html {
@@ -99,6 +105,24 @@ $og_img_alt = 'Horsebooth'
                 font-weight: 600;
                 background-image: linear-gradient(to right, #7f53ac 0, #657ced 100%);
                 color: black;
+            }
+
+            .front-cover {
+                background-image: linear-gradient(black, white), url(<?=$first_img?>);
+                background-position: center;
+                background-repeat: no-repeat;
+                background-blend-mode: screen;
+                background-size: cover;
+                max-height: 30vh;
+                height: 100vw;
+                text-align: center;
+                box-shadow: inset 0 -5px 20px 0 #000000;
+                display: flex;
+                align-content: center;
+                justify-content: center;
+                align-items: center;
+                font-size: clamp(5vw, 70px, 10vw);
+                text-transform: uppercase;
             }
 
             a {
@@ -126,23 +150,24 @@ $og_img_alt = 'Horsebooth'
 
             .btn img {
                 width: 100%;
-                box-shadow: 0 5px 3px 1px #807c7c;
+                box-shadow: 0 0 10px 1px #000000;
             }
 
             .container {
                 display: grid;
                 gap: 1rem;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
                 align-content: center;
                 align-items: end;
                 justify-content: center;
+                max-width: 1000px;
+                margin: 0 auto;
+                padding: 1rem 1rem 0 1rem;
             }
         </style>
     </head>
     <body>
-        <header>
-            <h1>{title}</h1>
-        </header>
+        <header class="front-cover">{title}</header>
 
         <div class="container">
             <?php $index = 0; ?>
@@ -160,9 +185,12 @@ $og_img_alt = 'Horsebooth'
                 </div>
                 <div id="open-modal<?=$index?>" class="modal-window">
                     <div class="modal-content" style="background-image: url('<?=$this_full?>')">
-                        <div class="action-bar">
-                            <a href='<?=$this_full?>' class="image-element" download='<?=$og_img_alt?>_<?=$download_name?>'><i class="fa-solid fa-download"></i></a>
-                            <a href="#opener<?=$index?>" title="Close"><i class="fa-solid fa-xmark"></i></a>
+                        <div class="action-bar-outer">
+                            <div class="action-bar">
+                                <a href='<?=$this_full?>' class="image-element" download='<?=$og_img_alt?>_<?=$download_name?>'><i class="fa-solid fa-download"></i></a>
+                                <a href="whatsapp://send?text=<?=urldecode(sprintf($whatsapp_msg, $actual_link . substr($this_full, 2)))?>"><i class="fa-brands fa-whatsapp"></i></a>
+                                <a href="#opener<?=$index?>" title="Close"><i class="fa-solid fa-xmark"></i></a>
+                            </div>
                         </div>
                     </div>
                 </div>
