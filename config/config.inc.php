@@ -307,6 +307,7 @@ $config['ftp']['website'] = '';
 $config['ftp']['create_webpage'] = false;
 $config['ftp']['template_location'] = '';
 $config['ftp']['upload_thumb'] = false;
+$config['ftp']['delete'] = false;
 
 
 // A U T H E N T I C A T I O N
