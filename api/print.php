@@ -76,7 +76,7 @@ if (!file_exists($filename_print)) {
         // create qr code
         if (!file_exists($filename_codes)) {
             if ($config['ftp']['enabled'] && $config['ftp']['useForQr']) {
-                $destination = $config['ftp']['folder'];
+                $destination = $config['ftp']['folder'] . DIRECTORY_SEPARATOR . slugify($config['ftp']['title']);
                 if ($config['ftp']['appendDate']) {
                     $destination .= DIRECTORY_SEPARATOR . date('Y/m/d');
                 }
