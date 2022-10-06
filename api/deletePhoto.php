@@ -56,18 +56,16 @@ if ($config['ftp']['enabled'] && $config['ftp']['delete']) {
         $remote_dest .= DIRECTORY_SEPARATOR . date('Y/m/d');
     }
 
-    $remote_file = $remote_dest . DIRECTORY_SEPARATOR . $file;
+    @cdFTPTree($ftp, $remote_dest);
 
-    $delete_result = ftp_delete($ftp, $remote_file);
+    $delete_result = ftp_delete($ftp, $file);
 
     if (!$delete_result) {
         logError('Unable to delete file on ftp server ' . $file);
     }
 
     if ($config['ftp']['upload_thumb']) {
-        $remote_file = $remote_dest . DIRECTORY_SEPARATOR . 'tmb_' . $file;
-
-        $delete_result = ftp_delete($ftp, $remote_file);
+        $delete_result = ftp_delete($ftp, 'tmb_' . $file);
 
         if (!$delete_result) {
             logError('Unable to delete file on ftp server ' . $file);
