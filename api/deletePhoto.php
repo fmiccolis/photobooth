@@ -71,6 +71,9 @@ if ($config['ftp']['enabled'] && $config['ftp']['delete']) {
             logError('Unable to delete file on ftp server ' . $file);
         }
     }
+
+    // close the connection
+    ftp_close($ftp);
 }
 
 echo json_encode([
