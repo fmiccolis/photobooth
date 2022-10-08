@@ -10,6 +10,9 @@ $og_description = 'Prenota l\'horse booth di cavallo production per riempire la 
 $og_sitename = 'Cavallo Production';
 $og_img_alt = 'Horsebooth';
 $whatsapp_msg = "Guarda questa foto scattata dall'Horsebooth! \n\n %s \n\n\n\n Prenota anche tu l'Horsebooth allo 0801234567";
+$seconds_to_cache = 60;
+
+header("Cache-Control: max-age=$seconds_to_cache");
 ?>
 
 <!DOCTYPE html>
@@ -63,10 +66,11 @@ $whatsapp_msg = "Guarda questa foto scattata dall'Horsebooth! \n\n %s \n\n\n\n P
                 left: 50%;
                 transform: translate(-50%, -50%);
                 background-color: transparent;
-                border-radius: 1rem;
-                background-size: contain;
-                background-repeat: no-repeat;
-                background-position: center;
+            }
+            .modal-window > div > img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
             }
 
             .action-bar-outer {
@@ -151,12 +155,14 @@ $whatsapp_msg = "Guarda questa foto scattata dall'Horsebooth! \n\n %s \n\n\n\n P
             .btn img {
                 width: 100%;
                 box-shadow: 0 0 10px 1px #000000;
+                aspect-ratio: 1;
+                object-fit: cover;
             }
 
             .container {
                 display: grid;
                 gap: 1rem;
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
                 align-content: center;
                 align-items: end;
                 justify-content: center;
@@ -184,7 +190,7 @@ $whatsapp_msg = "Guarda questa foto scattata dall'Horsebooth! \n\n %s \n\n\n\n P
                     </div>
                 </div>
                 <div id="open-modal<?=$index?>" class="modal-window">
-                    <div class="modal-content" style="background-image: url('<?=$this_full?>')">
+                    <div class="modal-content">
                         <div class="action-bar-outer">
                             <div class="action-bar">
                                 <a href='<?=$this_full?>' class="image-element" download='<?=$og_img_alt?>_<?=$download_name?>'><i class="fa-solid fa-download"></i></a>
@@ -192,6 +198,7 @@ $whatsapp_msg = "Guarda questa foto scattata dall'Horsebooth! \n\n %s \n\n\n\n P
                                 <a href="#opener<?=$index?>" title="Close"><i class="fa-solid fa-xmark"></i></a>
                             </div>
                         </div>
+                        <img src="<?=$this_full?>" loading="lazy" alt="<?=$filename?>" />
                     </div>
                 </div>
             <?php } ?>
