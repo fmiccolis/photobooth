@@ -137,7 +137,9 @@ foreach ($srcImages as $image) {
         // turn passive mode on to enable creation of folder and upload of files
         ftp_pasv($ftp, true);
 
-        $destination = $config['ftp']['folder'] . DIRECTORY_SEPARATOR . slugify($config['ftp']['title']);
+        $destination = empty($config['ftp']['baseFolder']) ? '' : DIRECTORY_SEPARATOR . $config['ftp']['baseFolder'] . DIRECTORY_SEPARATOR;
+
+        $destination .= $config['ftp']['folder'] . DIRECTORY_SEPARATOR . slugify($config['ftp']['title']);
         if ($config['ftp']['appendDate']) {
             $destination .= DIRECTORY_SEPARATOR . date('Y/m/d');
         }
