@@ -47,6 +47,23 @@ $(function () {
         }
     });
 
+    $('#test-connection').on('click', function (e) {
+        e.preventDefault();
+        const elem = $(this);
+        const data = $('form').serialize();
+        elem.addClass('saving');
+        $.ajax({
+            url: '../api/testFtpConnection.php',
+            dataType: 'json',
+            data: data,
+            type: 'post',
+            success: function (resp) {
+                elem.removeClass('saving');
+                alert(resp);
+            }
+        });
+    });
+
     $('#save-admin-btn').on('click', function (e) {
         e.preventDefault();
         const elem = $(this);
