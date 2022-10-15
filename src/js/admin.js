@@ -50,12 +50,13 @@ $(function () {
     $('#test-connection').on('click', function (e) {
         e.preventDefault();
         const elem = $(this);
-        const data = $('form').serialize();
+        const data = $('form').serializeArray();
+        const onlyftp = data.filter(el => {if(el.name.startsWith('ftp')) return el});
         elem.addClass('saving');
         $.ajax({
             url: '../api/testFtpConnection.php',
             dataType: 'json',
-            data: data,
+            data: $.param(onlyftp),
             type: 'post',
             success: function (resp) {
                 elem.removeClass('saving');
