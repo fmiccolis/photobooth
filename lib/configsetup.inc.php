@@ -1300,6 +1300,13 @@ $configsetup = [
             'range_step' => 1,
             'unit' => 'empty',
         ],
+        'print_qrBgColor' => [
+            'view' => 'expert',
+            'type' => 'color',
+            'name' => 'print[qrBgColor]',
+            'placeholder' => $defaultConfig['print']['qrBgColor'],
+            'value' => $config['print']['qrBgColor'],
+        ],
         'print_print_frame' => [
             'view' => 'expert',
             'type' => 'checkbox',
