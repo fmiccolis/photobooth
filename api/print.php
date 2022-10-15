@@ -76,16 +76,7 @@ if (!file_exists($filename_print)) {
         // create qr code
         if (!file_exists($filename_codes)) {
             if ($config['ftp']['enabled'] && $config['ftp']['useForQr']) {
-                $destination = $config['ftp']['folder'] . DIRECTORY_SEPARATOR . slugify($config['ftp']['title']);
-                if ($config['ftp']['appendDate']) {
-                    $destination .= DIRECTORY_SEPARATOR . date("Y/m/d");
-                }
-
-                if ($config['ftp']['website'] != '') {
-                    $url = $config['ftp']['website'] . $destination . DIRECTORY_SEPARATOR . $filename;
-                } else {
-                    $url = substr($destination . DIRECTORY_SEPARATOR . $filename, 1);
-                }
+                $url = $config['ftp']['processedTemplate'] . DIRECTORY_SEPARATOR . $filename;
             } else if ($config['qr']['append_filename']) {
                 $url = $config['qr']['url'] . $filename;
             } else {

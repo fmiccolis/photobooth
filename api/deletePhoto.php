@@ -51,7 +51,9 @@ if ($config['ftp']['enabled'] && $config['ftp']['delete']) {
         logErrorAndDie("Can't connect to FTP Server!");
     }
 
-    $remote_dest = $config['ftp']['folder'] . DIRECTORY_SEPARATOR . slugify($config['ftp']['title']);
+    $remote_dest = empty($config['ftp']['baseFolder']) ? '' : DIRECTORY_SEPARATOR . $config['ftp']['baseFolder'] . DIRECTORY_SEPARATOR;
+
+    $remote_dest .= $config['ftp']['folder'] . DIRECTORY_SEPARATOR . slugify($config['ftp']['title']);
     if ($config['ftp']['appendDate']) {
         $remote_dest .= DIRECTORY_SEPARATOR . date("Y/m/d");
     }
@@ -68,7 +70,7 @@ if ($config['ftp']['enabled'] && $config['ftp']['delete']) {
         $delete_result = ftp_delete($ftp, "tmb_" . $file);
 
         if (!$delete_result) {
-            logError("Unable to delete file on ftp server " . $file);
+            logError("Unable to delete thumb on ftp server " . $file);
         }
     }
 
