@@ -1841,6 +1841,13 @@ $configsetup = [
             'name' => 'ftp[password]',
             'value' => htmlentities($config['ftp']['password'] ?? ''),
         ],
+        'test_connection' => [
+            'view' => 'basic',
+            'type' => 'button',
+            'placeholder' => 'testConnection',
+            'name' => 'TESTCONNECTION',
+            'value' => 'test-connection',
+        ],
         'baseFolder' => [
             'view' => 'advanced',
             'type' => 'input',
