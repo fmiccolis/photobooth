@@ -249,4 +249,16 @@ if (empty($config['ftp']['template_location']) || !testFile($config['ftp']['temp
     $config['ftp']['template_location'] = $default_template;
 }
 
+if (!empty($config['ftp']['urlTemplate'])) {
+    $parameters = array(
+        '%website' => $config['ftp']['website'],
+        '%baseFolder' => $config['ftp']['baseFolder'],
+        '%folder' => $config['ftp']['folder'],
+        '%title' => slugify($config['ftp']['title']),
+        '%date' => date('Y/m/d'),
+    );
+
+    $config['ftp']['processedTemplate'] = str_replace(array_keys($parameters), array_values($parameters), $config['ftp']['urlTemplate']);
+}
+
 $config['photobooth']['version'] = getPhotoboothVersion();
