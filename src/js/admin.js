@@ -59,16 +59,16 @@ $(function () {
             dataType: 'json',
             data: data,
             type: 'post',
-            success: function (data) {
+            success: function (resp) {
                 elem.removeClass('saving');
-                elem.addClass(data.response);
-                if (data.missing !== '') {
-                    const missingEl = data.missing.slice(0, -1).split(',');
+                elem.addClass(resp.response);
+                if (resp.missing !== '') {
+                    const missingEl = resp.missing.slice(0, -1).split(',');
                     missingEl.forEach((el) => {
                         $('[name="ftp[' + el + ']"]').addClass('required');
                     });
                 }
-                alert(photoboothTools.getTranslation(data.message));
+                alert(photoboothTools.getTranslation(resp.message));
             }
         });
     });
