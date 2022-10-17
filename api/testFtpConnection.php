@@ -19,7 +19,7 @@ foreach ($params as $param) {
     }
 }
 
-if($result['missing'] == '') {
+if($result['missing'] != '') {
     die(json_encode($result));
 }
 
