@@ -1813,7 +1813,7 @@ $configsetup = [
             'name' => 'ftp[enabled]',
             'value' => $config['ftp']['enabled'],
         ],
-        'baseUrl' => [
+        'baseURL' => [
             'view' => 'advanced',
             'type' => 'input',
             'placeholder' => 'ftp.photobooth.com',
