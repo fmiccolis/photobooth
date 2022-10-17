@@ -22,7 +22,6 @@
   --preview-rotation: 0deg;
   --picture-frame: none;
   --collage-frame: none;
-  --required-field-message: none;
 }
 
 $mainColor: var(--primary-color);
@@ -47,4 +46,3 @@ $fontSize: var(--fontSize);
 $previewRotation: var(--preview-rotation);
 $pictureFrame: var(--picture-frame);
 $collageFrame: var(--collage-frame);
-$requiredFieldMessage: var(--required-field-message);
