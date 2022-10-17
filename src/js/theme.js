@@ -1,3 +1,4 @@
+/* globals photoboothTools */
 const style = document.documentElement.style;
 
 style.setProperty('--primary-color', config.colors.primary);
