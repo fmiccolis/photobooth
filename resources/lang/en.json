@@ -631,6 +631,7 @@
   "remotebuzzer:remotebuzzer_usebuttons": "Enable Hardware Buttons",
   "remotebuzzer:remotebuzzer_usenogpio": "Use remotebuzzer without GPIO support",
   "remotebuzzer:remotebuzzer_userotary": "Enable Rotary Encoder",
+  "required_field_message": "Required field",
   "reset": "Reset",
   "reset:reset_button": "Execute config reset",
   "reset:reset_remove_config": "Delete personal configuration (my.config.inc.php)",
