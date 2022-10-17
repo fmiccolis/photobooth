@@ -51,15 +51,24 @@ $(function () {
         e.preventDefault();
         const elem = $(this);
         const data = $('form').serialize();
+        elem.removeClass('error success');
+        $('[name^="ftp"]').removeClass('required');
         elem.addClass('saving');
         $.ajax({
             url: '../api/testFtpConnection.php',
             dataType: 'json',
             data: data,
             type: 'post',
-            success: function (resp) {
+            success: function (data) {
                 elem.removeClass('saving');
-                alert(resp);
+                elem.addClass(data.response);
+                if (data.missing !== '') {
+                    const missingEl = data.missing.slice(0, -1).split(',');
+                    missingEl.forEach((el) => {
+                        $('[name="ftp[' + el + ']"]').addClass('required');
+                    });
+                }
+                alert(photoboothTools.getTranslation(data.message));
             }
         });
     });
