@@ -10,12 +10,12 @@ $params = ['baseUrl', 'port', 'username', 'password'];
 $result = [
     'response' => 'error',
     'message' => 'ftp:missing_parameters',
-    'missing' => '',
+    'missing' => [],
 ];
 
 foreach ($params as $param) {
     if (!isset($data['ftp'][$param])) {
-        $result['missing'] .= $param . ',';
+        $result['missing'][] = $param;
     }
 }
 

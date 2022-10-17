@@ -62,12 +62,11 @@ $(function () {
             success: function (resp) {
                 elem.removeClass('saving');
                 elem.addClass(resp.response);
-                if (resp.missing !== '') {
-                    const missingEl = resp.missing.slice(0, -1).split(',');
-                    missingEl.forEach((el) => {
-                        $('[name="ftp[' + el + ']"]').addClass('required');
-                    });
-                }
+                console.log(resp);
+                resp.missing.forEach((el) => {
+                    photoboothTools.console.log(el);
+                    $('[name="ftp[' + el + ']"]').addClass('required');
+                });
                 alert(photoboothTools.getTranslation(resp.message));
             }
         });
