@@ -5,16 +5,41 @@ require_once '../lib/log.php';
 
 $data = $_POST;
 
+$params = ['baseUrl', 'port', 'username', 'password'];
+
+$result = array(
+    'response' => 'error',
+    'message' => 'ftp:missing_parameters',
+    'missing' => ''
+);
+
+foreach ($params as $param) {
+    if(!isset($data['ftp'][$param])) {
+        $result['missing'] .= $param . ',';
+    }
+}
+
+if($result['missing'] == '') {
+    die(json_encode($result));
+}
+
+$baseUrl = $data['ftp']['baseURL'];
+$port = $data['ftp']['port'];
+$username = $data['ftp']['username'];
+$password = $data['ftp']['password'];
+
 // init connection to ftp server
-$ftp = ftp_ssl_connect($data['ftp']['baseURL'], $data['ftp']['port']);
+$ftp = ftp_ssl_connect($baseUrl, $port);
 
 // login to ftp server
-$login_result = ftp_login($ftp, $data['ftp']['username'], $data['ftp']['password']);
+$login_result = ftp_login($ftp, $username, $password);
 
 if (!$login_result) {
     logError("Can't connect to FTP Server!");
-    die(json_encode("Can't connect to FTP Server!"));
+    $result['message'] = 'ftp:no_connection';
+    die(json_encode($result));
 }
 ftp_close($ftp);
-
-die(json_encode("Connected to FTP Server!"));
+$result['response'] = 'success';
+$result['message'] = 'ftp:connected';
+die(json_encode($result));
