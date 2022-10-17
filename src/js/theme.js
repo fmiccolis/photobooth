@@ -22,6 +22,7 @@ style.setProperty('--fontSize', config.ui.font_size);
 style.setProperty('--preview-rotation', config.preview.rotation);
 style.setProperty('--picture-frame', config.picture.htmlframe);
 style.setProperty('--collage-frame', config.collage.htmlframe);
+style.setProperty('--required-field-text', photoboothTools.getTranslation('required_field_message'));
 
 $(function () {
     $('#wrapper').show();
