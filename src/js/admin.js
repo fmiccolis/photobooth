@@ -65,7 +65,7 @@ $(function () {
                 console.log(resp);
                 resp.missing.forEach(el => {
                     photoboothTools.console.log(el);
-                    $('#ftp:' + el).addClass('required');
+                    $('#ftp\\:' + el).addClass('required');
                 })
                 alert(photoboothTools.getTranslation(resp.message));
             }
