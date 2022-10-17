@@ -1844,7 +1844,7 @@ $configsetup = [
         'test_connection' => [
             'view' => 'basic',
             'type' => 'button',
-            'placeholder' => 'testConnection',
+            'placeholder' => 'test_connection',
             'name' => 'TESTCONNECTION',
             'value' => 'test-connection',
         ],

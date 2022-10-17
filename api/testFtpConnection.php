@@ -14,7 +14,7 @@ $result = [
 ];
 
 foreach ($params as $param) {
-    if (!isset($data['ftp'][$param])) {
+    if ($data['ftp'][$param] == '') {
         $result['missing'][] = $param;
     }
 }
