@@ -1,3 +1,4 @@
+/* globals photoboothTools */
 const style = document.documentElement.style;
 
 style.setProperty('--primary-color', config.colors.primary);
@@ -22,6 +23,7 @@ style.setProperty('--fontSize', config.ui.font_size);
 style.setProperty('--preview-rotation', config.preview.rotation);
 style.setProperty('--picture-frame', config.picture.htmlframe);
 style.setProperty('--collage-frame', config.collage.htmlframe);
+style.setProperty('--required-field-message', photoboothTools.getTranslation('required_field_message'));
 
 $(function () {
     $('#wrapper').show();
