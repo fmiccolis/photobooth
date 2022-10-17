@@ -7,4 +7,12 @@ $success: #2ecc71;
 
 .required {
   box-shadow: 0 0 10px 0 $error;
+
+  &::after {
+    content: "Required Field";
+    width: 100%;
+    height: 20px;
+    background-color: $error;
+    border: 1px solid #a10c01;
+  }
 }
