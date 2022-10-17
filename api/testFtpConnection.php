@@ -5,7 +5,7 @@ require_once '../lib/log.php';
 
 $data = $_POST;
 
-$params = ['baseUrl', 'port', 'username', 'password'];
+$params = ['baseURL', 'port', 'username', 'password'];
 
 $result = array(
     'response' => 'error',
@@ -19,7 +19,7 @@ foreach ($params as $param) {
     }
 }
 
-if($result['missing'] != '') {
+if(!empty($result['missing'])) {
     die(json_encode($result));
 }
 
