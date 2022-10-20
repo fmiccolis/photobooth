@@ -108,3 +108,46 @@ function getPhotoboothVersion() {
     $package = json_decode($packageContent, true);
     return $package['version'];
 }
+
+// use this function in combination with '@' to avoid Warning text
+// the reason is that ftp_chdir generate a warning message when the destination folder does not exist
+// In this case we create the folder on the FTP server if not exist, and we can ignore the warning.
+// e.g. @cdFTPTree($ftp, "/path/to/dir");
+function cdFTPTree($conn, $currentDir) {
+    if ($currentDir != '') {
+        if (!ftp_chdir($conn, $currentDir)) {
+            $exploded = explode(DIRECTORY_SEPARATOR, $currentDir);
+            array_pop($exploded);
+            $rejoined = join(DIRECTORY_SEPARATOR, $exploded);
+            cdFTPTree($conn, $rejoined);
+            ftp_mkdir($conn, $currentDir);
+            ftp_chdir($conn, $currentDir);
+        }
+    }
+}
+
+function slugify($text, string $divider = '-') {
+    // replace non letter or digits by divider
+    $text = preg_replace('~[^\pL\d]+~u', $divider, $text);
+
+    // transliterate
+    $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+
+    // remove unwanted characters
+    $text = preg_replace('~[^-\w]+~', '', $text);
+
+    // trim
+    $text = trim($text, $divider);
+
+    // remove duplicate divider
+    $text = preg_replace('~-+~', $divider, $text);
+
+    // lowercase
+    $text = strtolower($text);
+
+    if (empty($text)) {
+        return 'n-a';
+    }
+
+    return $text;
+}
