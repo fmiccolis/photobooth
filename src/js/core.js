@@ -16,6 +16,18 @@ const photoBooth = (function () {
             NONE: 'none',
             DEVICE: 'device_cam',
             URL: 'url'
+        },
+        PreviewStyle = {
+            FILL: 'fill',
+            CONTAIN: 'contain',
+            COVER: 'cover',
+            NONE: 'none',
+            SCALE_DOWN: 'scale-down'
+        },
+        CollageFrameMode = {
+            OFF: 'off',
+            ALWAYS: 'always',
+            ONCE: 'once'
         };
 
     const api = {},
@@ -47,6 +59,8 @@ const photoBooth = (function () {
         aperture = $('#aperture'),
         idVideoView = $('#video--view'),
         idVideoSensor = $('#video--sensor'),
+        pictureFrame = $('#picture--frame'),
+        collageFrame = $('#collage--frame'),
         videoView = idVideoView.get(0),
         videoSensor = document.querySelector('#video--sensor'),
         usesBackgroundPreview =
@@ -102,6 +116,8 @@ const photoBooth = (function () {
         gallery.removeClass('gallery--open');
         gallery.find('.gallery__inner').hide();
         idVideoView.hide();
+        collageFrame.hide();
+        pictureFrame.hide();
         idVideoView.css('z-index', 0);
         idVideoSensor.hide();
         ipcamView.hide();
@@ -243,6 +259,18 @@ const photoBooth = (function () {
 
         photoboothPreview.startVideo(CameraDisplayMode.COUNTDOWN, retry);
 
+        if (
+            config.preview.mode !== PreviewMode.NONE &&
+            (config.preview.style === PreviewStyle.CONTAIN || config.preview.style === PreviewStyle.SCALE_DOWN) &&
+            config.preview.showFrame
+        ) {
+            if (photoStyle === PhotoStyle.PHOTO && config.picture.take_frame) {
+                pictureFrame.show();
+            } else if (photoStyle === PhotoStyle.COLLAGE && config.collage.take_frame === CollageFrameMode.ALWAYS) {
+                collageFrame.show();
+            }
+        }
+
         loader.addClass('open');
 
         if (config.get_request.countdown) {
@@ -369,6 +397,8 @@ const photoBooth = (function () {
                     loading.empty();
                     idVideoSensor.hide();
                     idVideoView.hide();
+                    collageFrame.hide();
+                    pictureFrame.hide();
 
                     let imageUrl = config.foldersJS.tmp + '/' + result.collage_file;
                     const preloadImage = new Image();
@@ -516,6 +546,8 @@ const photoBooth = (function () {
             cheese.empty();
             idVideoView.hide();
             idVideoSensor.hide();
+            collageFrame.hide();
+            pictureFrame.hide();
             loader.addClass('error');
             loading.append($('<p>').text(photoboothTools.getTranslation('error')));
             photoboothTools.console.log('An error occurred:', data.error);
@@ -1227,6 +1259,20 @@ const photoBooth = (function () {
             e.preventDefault();
         });
     }
+
+    idVideoView.on('loadedmetadata', function (ev) {
+        const videoEl = ev.target;
+        let newWidth = videoEl.offsetWidth;
+        let newHeight = videoEl.offsetHeight;
+        if (config.preview.style === PreviewStyle.SCALE_DOWN) {
+            newWidth = videoEl.videoWidth;
+            newHeight = videoEl.videoHeight;
+        }
+        pictureFrame.css('width', newWidth);
+        pictureFrame.css('height', newHeight);
+        collageFrame.css('width', newWidth);
+        collageFrame.css('height', newHeight);
+    });
 
     return api;
 })();
