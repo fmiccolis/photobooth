@@ -1273,10 +1273,12 @@ const photoBooth = (function () {
             newWidth = videoEl.videoWidth;
             newHeight = videoEl.videoHeight;
         }
-        pictureFrame.css('width', newWidth);
-        pictureFrame.css('height', newHeight);
-        collageFrame.css('width', newWidth);
-        collageFrame.css('height', newHeight);
+        if(newWidth !== 0 && newHeight !== 0) {
+            pictureFrame.css('width', newWidth);
+            pictureFrame.css('height', newHeight);
+            collageFrame.css('width', newWidth);
+            collageFrame.css('height', newHeight);
+        }
     });
 
     return api;
