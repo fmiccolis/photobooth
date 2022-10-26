@@ -75,7 +75,9 @@ if (!file_exists($filename_print)) {
     if ($config['print']['qrcode'] && file_exists('../vendor/phpqrcode/lib/full/qrlib.php')) {
         // create qr code
         if (!file_exists($filename_codes)) {
-            if ($config['qr']['append_filename']) {
+            if ($config['ftp']['enabled'] && $config['ftp']['useForQr']) {
+                $url = $config['ftp']['processedTemplate'] . DIRECTORY_SEPARATOR . $filename;
+            } elseif ($config['qr']['append_filename']) {
                 $url = $config['qr']['url'] . $filename;
             } else {
                 $url = $config['qr']['url'];
