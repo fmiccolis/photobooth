@@ -10,10 +10,7 @@ RUNNING_ON_PI=true
 FORCE_RASPBERRY_PI=false
 DATE=$(date +"%Y%m%d-%H-%M")
 IPADDRESS=$(hostname -I | cut -d " " -f 1)
-if [ ! -d "/tmp/photobooth" ]; then
-    mkdir -p "/tmp/photobooth"
-fi
-PHOTOBOOTH_TMP_LOG="/tmp/photobooth/$DATE-photobooth"
+PHOTOBOOTH_TMP_LOG="/tmp/$DATE-photobooth.txt"
 
 BRANCH="dev"
 GIT_INSTALL=true
@@ -418,12 +415,8 @@ common_software() {
                 wget https://raw.githubusercontent.com/gonzalo/gphoto2-updater/master/.env
                 chmod +x gphoto2-updater.sh
                 ./gphoto2-updater.sh --stable
-                if [ -f "gphoto2-updater.sh" ]; then
-                    rm gphoto2-updater.sh
-                fi
-                if [ -f ".env" ]; then
-                    rm .env
-                fi
+                rm gphoto2-updater.sh
+                rm .env
             else
                 apt install -y ${package}
             fi
