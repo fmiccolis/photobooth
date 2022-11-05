@@ -1,11 +1,19 @@
 /* globals photoboothTools photoboothPreview */
 const photoboothPreviewTest = (function () {
-    const CameraDisplayMode = {
-        INIT: 1,
-        BACKGROUND: 2,
-        COUNTDOWN: 3,
-        TEST: 3
-    };
+    const
+        CameraDisplayMode = {
+            INIT: 1,
+            BACKGROUND: 2,
+            COUNTDOWN: 3,
+            TEST: 3
+        },
+        PreviewStyle = {
+            FILL: 'fill',
+            CONTAIN: 'contain',
+            COVER: 'cover',
+            NONE: 'none',
+            SCALE_DOWN: 'scale-down'
+        };
 
     const api = {},
         ipcamView = $('#ipcam--view'),
@@ -20,7 +28,7 @@ const photoboothPreviewTest = (function () {
         $('#no_preview').show();
         $('.stopPreview').hide();
         pictureFrame.hide();
-        collageFrameFrame.hide();
+        collageFrame.hide();
         $('.hideFrame').hide();
     };
 
