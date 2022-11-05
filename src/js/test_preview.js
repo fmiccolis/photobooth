@@ -9,7 +9,9 @@ const photoboothPreviewTest = (function () {
 
     const api = {},
         ipcamView = $('#ipcam--view'),
-        idVideoView = $('#video--view');
+        idVideoView = $('#video--view'),
+        pictureFrame = $('#picture--frame'),
+        collageFrame = $('#collage--frame');
 
     api.init = function () {
         idVideoView.hide();
@@ -17,6 +19,9 @@ const photoboothPreviewTest = (function () {
         ipcamView.hide();
         $('#no_preview').show();
         $('.stopPreview').hide();
+        pictureFrame.hide();
+        collageFrameFrame.hide();
+        $('.hideFrame').hide();
     };
 
     $('.startPreview').on('click', function (e) {
@@ -51,6 +56,41 @@ const photoboothPreviewTest = (function () {
                 $('.startPreview').show();
             }
         }, 4000);
+    });
+
+    $('.showPictureFrame').on('click', function (e) {
+        e.preventDefault();
+        pictureFrame.show();
+        $('.hideFrame').show();
+    });
+
+    $('.showCollageFrame').on('click', function (e) {
+        e.preventDefault();
+        collageFrame.show();
+        $('.hideFrame').show();
+    });
+
+    $('.hideFrame').on('click', function (e) {
+        e.preventDefault();
+        collageFrame.hide();
+        pictureFrame.hide();
+        $('.hideFrame').hide();
+    });
+
+    idVideoView.on('loadedmetadata', function (ev) {
+        const videoEl = ev.target;
+        let newWidth = videoEl.offsetWidth;
+        let newHeight = videoEl.offsetHeight;
+        if (config.preview.style === PreviewStyle.SCALE_DOWN) {
+            newWidth = videoEl.videoWidth;
+            newHeight = videoEl.videoHeight;
+        }
+        if (newWidth !== 0 && newHeight !== 0) {
+            pictureFrame.css('width', newWidth);
+            pictureFrame.css('height', newHeight);
+            collageFrame.css('width', newWidth);
+            collageFrame.css('height', newHeight);
+        }
     });
 
     return api;
