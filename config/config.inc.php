@@ -321,8 +321,6 @@ $config['login']['username'] = 'Photo';
 $config['login']['password'] = '';
 $config['protect']['admin'] = true;
 $config['protect']['localhost_admin'] = true;
-$config['protect']['update'] = true;
-$config['protect']['localhost_update'] = true;
 $config['protect']['index'] = false;
 $config['protect']['localhost_index'] = false;
 $config['protect']['index_redirect'] = 'login';
@@ -361,6 +359,52 @@ $config['colors']['hover_panel'] = '#2e2e2e';
 $config['colors']['border'] = '#eeeeee';
 $config['colors']['box'] = '#f8f9fc';
 $config['colors']['gallery_button'] = '#ffffff';
+
+
+// I C O N S
+$config['icons']['admin_back'] = 'fa fa-long-arrow-left fa-3x';
+$config['icons']['admin_back_short'] = 'fa fa-arrow-left';
+$config['icons']['admin_menutoggle'] = 'fa fa-bars fa-3x';
+$config['icons']['admin_save'] = 'fa fa-circle-o-notch fa-spin fa-fw';
+$config['icons']['admin_save_success'] = 'fa fa-check';
+$config['icons']['admin_save_error'] = 'fa fa-times';
+$config['icons']['admin_signout'] = 'fa fa-sign-out fa-3x';
+$config['icons']['admin'] = 'fa fa-cog';
+$config['icons']['home'] = 'fa fa-home';
+$config['icons']['gallery'] = 'fa fa-picture-o';
+$config['icons']['dependencies'] = 'fa fa-list-ul';
+$config['icons']['update'] = 'fa fa-tasks';
+$config['icons']['slideshow'] = 'fa fa-play';
+$config['icons']['livechroma'] = 'fa fa-paint-brush';
+$config['icons']['faq'] = 'fa fa-question-circle';
+$config['icons']['manual'] = 'fa fa-info-circle';
+$config['icons']['telegram'] = 'fa fa-telegram';
+$config['icons']['cups'] = 'fa fa-print';
+$config['icons']['take_picture'] = 'fa fa-camera';
+$config['icons']['take_collage'] = 'fa fa-th-large';
+$config['icons']['close'] = 'fa fa-times';
+$config['icons']['refresh'] = 'fa fa-refresh';
+$config['icons']['delete'] = 'fa fa-trash';
+$config['icons']['print'] = 'fa fa-print';
+$config['icons']['save'] = 'fa fa-floppy-o';
+$config['icons']['download'] = 'fa fa-download';
+$config['icons']['qr'] = 'fa fa-qrcode';
+$config['icons']['mail'] = 'fa fa-envelope';
+$config['icons']['mail_close'] = 'fa fa-times';
+$config['icons']['mail_submit'] = 'fa fa-spinner fa-spin';
+$config['icons']['filter'] = 'fa fa-magic';
+$config['icons']['chroma'] = 'fa fa-paint-brush';
+$config['icons']['fullscreen'] = 'fa fa-arrows-alt';
+$config['icons']['share'] = 'fa fa-share-alt';
+$config['icons']['zoom'] = 'fa fa-search-plus';
+$config['icons']['logout'] = 'fa fa-sign-out';
+$config['icons']['date'] = 'fa fa-clock-o';
+$config['icons']['spinner'] = 'fa fa-cog fa-spin';
+$config['icons']['update_git'] = 'fa fa-play-circle';
+$config['icons']['password_visibility'] = 'fa fa-eye';
+$config['icons']['password_toggle'] = 'fa-eye fa-eye-slash';
+$config['icons']['slideshow_play'] = 'fa fa-play';
+$config['icons']['slideshow_toggle'] = 'fa-play fa-pause';
 
 
 // J P E G   Q U A L I T Y

@@ -31,11 +31,6 @@ if (
 
     $imagelist = $config['gallery']['newest_first'] === true ? array_reverse($images) : $images;
 
-    if ($config['ui']['style'] === 'classic') {
-        $galleryIcon = 'fa-th';
-    } else {
-        $galleryIcon = 'fa-picture-o';
-    }
     $btnClass = 'btn btn--' . $config['ui']['button'];
     $btnShape = 'shape--' . $config['ui']['button'];
     $uiShape = 'shape--' . $config['ui']['style'];
@@ -69,6 +64,8 @@ if (
 
     <link rel="stylesheet" href="node_modules/normalize.css/normalize.css"/>
     <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.css"/>
+    <link rel="stylesheet" href="node_modules/material-icons/iconfont/material-icons.css">
+    <link rel="stylesheet" href="node_modules/material-icons/css/material-icons.css">
     <link rel="stylesheet" href="vendor/PhotoSwipe/dist/photoswipe.css"/>
     <link rel="stylesheet" href="vendor/PhotoSwipe/dist/default-skin/default-skin.css"/>
     <link rel="stylesheet" href="resources/css/<?php echo $config['ui']['style']; ?>_style.css?v=<?php echo $config['photobooth']['version']; ?>"/>
@@ -93,7 +90,7 @@ if (
     <!-- image Filter Pane -->
     <?php if ($config['filters']['enabled']): ?>
         <div id="mySidenav" class="dragscroll sidenav rotarygroup">
-            <a href="#" class="<?php echo $btnClass; ?> closebtn rotaryfocus"><i class="fa fa-times"></i></a>
+            <a href="#" class="<?php echo $btnClass; ?> closebtn rotaryfocus"><i class="<?php echo $config['icons']['close']; ?>"></i></a>
 
             <?php foreach (AVAILABLE_FILTERS as $filter => $name): ?>
                 <?php if (!in_array($filter, $config['filters']['disabled'])): ?>
@@ -110,7 +107,7 @@ if (
     <div class="stages" id="loader">
         <div class="loaderInner">
             <div class="spinner">
-                <i class="fa fa-cog fa-spin"></i>
+                <i class="<?php echo $config['icons']['spinner']; ?>"></i>
             </div>
 
             <div id="ipcam--view" class="<?php echo $config['preview']['style']; ?>"></div>
@@ -129,52 +126,51 @@ if (
 
         <div class="resultInner hidden">
             <?php if ($config['button']['homescreen']): ?>
-                <a href="#" class="<?php echo $btnClass; ?> homebtn rotaryfocus"><i class="fa fa-home"></i> <span
+                <a href="#" class="<?php echo $btnClass; ?> homebtn rotaryfocus"><i class="<?php echo $config['icons']['home']; ?>"></i> <span
                             data-i18n="home"></span></a>
             <?php endif; ?>
 
             <?php if ($config['gallery']['enabled']): ?>
-                <a href="#" class="<?php echo $btnClass; ?> gallerybtn rotaryfocus"><i
-                            class="fa <?php echo $galleryIcon; ?>"></i> <span data-i18n="gallery"></span></a>
+                <a href="#" class="<?php echo $btnClass; ?> gallerybtn rotaryfocus"><i class="<?php echo $config['icons']['gallery']; ?>"></i> <span data-i18n="gallery"></span></a>
             <?php endif; ?>
 
             <?php if ($config['qr']['enabled']): ?>
-                <a href="#" class="<?php echo $btnClass; ?> qrbtn rotaryfocus"><i class="fa fa-qrcode"></i> <span
+                <a href="#" class="<?php echo $btnClass; ?> qrbtn rotaryfocus"><i class="<?php echo $config['icons']['qr']; ?>"></i> <span
                             data-i18n="qr"></span></a>
             <?php endif; ?>
 
             <?php if ($config['mail']['enabled']): ?>
-                <a href="#" class="<?php echo $btnClass; ?> mailbtn rotaryfocus"><i class="fa fa-envelope"></i> <span
+                <a href="#" class="<?php echo $btnClass; ?> mailbtn rotaryfocus"><i class="<?php echo $config['icons']['mail']; ?>"></i> <span
                             data-i18n="mail"></span></a>
             <?php endif; ?>
 
             <?php if ($config['print']['from_result']): ?>
-                <a href="#" class="<?php echo $btnClass; ?> printbtn rotaryfocus"><i class="fa fa-print"></i> <span
+                <a href="#" class="<?php echo $btnClass; ?> printbtn rotaryfocus"><i class="<?php echo $config['icons']['print']; ?>"></i> <span
                             data-i18n="print"></span></a>
             <?php endif; ?>
 
             <?php if (!$config['button']['force_buzzer']): ?>
                 <?php if (!($config['collage']['enabled'] && $config['collage']['only'])): ?>
-                    <a href="#" class="<?php echo $btnClass; ?> newpic rotaryfocus"><i class="fa fa-camera"></i> <span
+                    <a href="#" class="<?php echo $btnClass; ?> newpic rotaryfocus"><i class="<?php echo $config['icons']['take_picture']; ?>"></i> <span
                                 data-i18n="newPhoto"></span></a>
                 <?php endif; ?>
 
                 <?php if ($config['collage']['enabled']): ?>
-                    <a href="#" class="<?php echo $btnClass; ?> newcollage rotaryfocus"><i class="fa fa-th-large"></i>
+                    <a href="#" class="<?php echo $btnClass; ?> newcollage rotaryfocus"><i class="<?php echo $config['icons']['take_collage']; ?>"></i>
                         <span
                                 data-i18n="newCollage"></span></a>
                 <?php endif; ?>
             <?php endif; ?>
 
             <?php if ($config['filters']['enabled']): ?>
-                <a href="#" class="<?php echo $btnClass; ?> imageFilter rotaryfocus"><i class="fa fa-magic"></i> <span
+                <a href="#" class="<?php echo $btnClass; ?> imageFilter rotaryfocus"><i class="<?php echo $config['icons']['filter']; ?>"></i> <span
                             data-i18n="selectFilter"></span></a>
             <?php endif; ?>
 
             <?php if ($config['picture']['allow_delete']): ?>
                 <a href="#" class="<?php echo $btnClass; ?> deletebtn <?php if ($config['delete']['no_request']) {
                     echo 'rotaryfocus';
-                } ?> "><i class="fa fa-trash"></i> <span data-i18n="delete"></span></a>
+                } ?> "><i class="<?php echo $config['icons']['delete']; ?>"></i> <span data-i18n="delete"></span></a>
             <?php endif; ?>
         </div>
 

@@ -41,6 +41,8 @@ $btnClass = 'adminnavlistelement ' . $btnShape . ' noborder';
 
         <link rel="stylesheet" type="text/css" href="../node_modules/normalize.css/normalize.css">
         <link rel="stylesheet" type="text/css" href="../node_modules/font-awesome/css/font-awesome.css">
+        <link rel="stylesheet" type="text/css" href="../node_modules/material-icons/iconfont/material-icons.css">
+        <link rel="stylesheet" type="text/css" href="../node_modules/material-icons/css/material-icons.css">
         <link rel="stylesheet" type="text/css" href="../node_modules/selectize/dist/css/selectize.css">
         <link rel="stylesheet" type="text/css" href="../resources/css/<?php echo $config['ui']['style']; ?>_admin.css?v=<?php echo $config['photobooth']['version']; ?>">
         <?php if (is_file("../private/overrides.css")): ?>
@@ -67,14 +69,14 @@ $btnClass = 'adminnavlistelement ' . $btnShape . ' noborder';
                 html_src_indent($indent++);
                 echo '<div class="admintopnavbar">';
                 html_src_indent($indent);
-                echo '<i class="fa fa-long-arrow-left fa-3x" id="admintopnavbarback"></i>';
+                echo '<i class="' . $config['icons']['admin_back'] . '" id="admintopnavbarback"></i>';
                 if(isset($_SESSION['auth']) && $_SESSION['auth'] === true)
                 {
                         html_src_indent($indent);
-                        echo '<i class="fa fa-sign-out fa-3x" id="admintopnavbarlogout"></i>';
+                        echo '<i class="' . $config['icons']['admin_signout'] . '" id="admintopnavbarlogout"></i>';
                 }
                 html_src_indent($indent);
-                echo '<i class="fa fa-bars fa-3x" id="admintopnavbarmenutoggle"></i>';
+                echo '<i class="' . $config['icons']['admin_menutoggle'] . '" id="admintopnavbarmenutoggle"></i>';
                 html_src_indent($indent);
                 echo '<i class="setting_section_heading"><span data-i18n="debugpanel">Debug Panel</span></i>';
                 html_src_indent(--$indent);

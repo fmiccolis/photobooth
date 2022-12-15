@@ -79,7 +79,7 @@ function initPhotoSwipeFromDOM(gallerySelector) {
             },
 
             focus: true,
-            clickToCloseNonZoomable: config.pswp.clickToCloseNonZoomablefalse,
+            clickToCloseNonZoomable: config.pswp.clickToCloseNonZoomable,
             closeOnScroll: config.pswp.closeOnScroll,
             closeOnOutsideClick: config.pswp.closeOnOutsideClick,
             preventSwiping: config.pswp.preventSwiping,
@@ -181,7 +181,7 @@ function initPhotoSwipeFromDOM(gallerySelector) {
         const stopSlideshow = function () {
             if (ssRunning) {
                 setSlideshowState(ssButtonClass, false);
-                $('.pswp__button--playpause').toggleClass('fa-play fa-pause');
+                $('.pswp__button--playpause').toggleClass(config.icons.slideshow_toggle);
             }
         };
 
@@ -260,7 +260,7 @@ function initPhotoSwipeFromDOM(gallerySelector) {
                     ev.stopPropagation();
                     $('.pswp__qr').empty().removeClass('qr-active').fadeOut('fast');
                 })
-                .append($('<i>').addClass('fa fa-times'))
+                .append('<i class="' + config.icons.close + '"></i>')
                 .css('float', 'right')
                 .appendTo(pswpQR);
             $('<img>')
@@ -329,7 +329,7 @@ function initPhotoSwipeFromDOM(gallerySelector) {
         e.preventDefault();
         e.stopPropagation();
         // toggle slideshow on/off
-        $('.pswp__button--playpause').toggleClass('fa-play fa-pause');
+        $('.pswp__button--playpause').toggleClass(config.icons.slideshow_toggle);
         setSlideshowState(this, !ssRunning);
     });
 

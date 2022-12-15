@@ -355,6 +355,7 @@ const photoBooth = (function () {
     };
 
     api.retryTakePic = function (photoStyle, retry) {
+        api.takingPic = false;
         retry += 1;
         loading.append(
             $('<p class="text-muted">').text(
@@ -423,9 +424,9 @@ const photoBooth = (function () {
                         'Taken collage photo number: ' + (result.current + 1) + ' / ' + result.limit
                     );
 
-                    // if there is a next shot initialize preview video at this point to have a smoother transition to it
                     if (result.current + 1 < result.limit) {
                         photoboothPreview.initializeMedia();
+                        api.takingPic = false;
                     }
 
                     if (config.collage.continuous) {
@@ -670,7 +671,7 @@ const photoBooth = (function () {
 
                 photoboothTools.modal.close('#qrCode');
             })
-            .append($('<i>').addClass('fa fa-times'))
+            .append('<i class="' + config.icons.close + '"></i>')
             .css('float', 'right')
             .appendTo(body);
         $('<img src="api/qrcode.php?filename=' + filename + '" alt="qr code"/>')
@@ -1075,7 +1076,7 @@ const photoBooth = (function () {
         const submitButton = form.find('.btn');
 
         mailMessageForm.empty();
-        submitButton.html('<i class="fa fa-spinner fa-spin"></i>');
+        submitButton.html('<i class="' + config.icons.mail_submit + '"></i>');
 
         $.ajax({
             url: 'api/sendPic.php',

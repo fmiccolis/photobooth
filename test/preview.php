@@ -30,6 +30,8 @@ $uiShape = 'shape--' . $config['ui']['style'];
 
     <link rel="stylesheet" href="../node_modules/normalize.css/normalize.css"/>
     <link rel="stylesheet" href="../node_modules/font-awesome/css/font-awesome.css"/>
+    <link rel="stylesheet" href="../node_modules/material-icons/iconfont/material-icons.css">
+    <link rel="stylesheet" href="../node_modules/material-icons/css/material-icons.css">
     <link rel="stylesheet" href="../resources/css/test_preview.css?v=<?php echo $config['photobooth']['version']; ?>"/>
     <?php if (is_file('../private/overrides.css')): ?>
         <link rel="stylesheet" href="../private/overrides.css?v=<?php echo $config['photobooth']['version']; ?>"/>
@@ -39,8 +41,7 @@ $uiShape = 'shape--' . $config['ui']['style'];
 <body>
     <img id="picture--frame" class="<?php echo $config['preview']['flip']; ?> <?php echo $config['preview']['style']; ?>" src="<?php echo $config['picture']['htmlframe']; ?>" alt="pictureFrame" />
     <img id="collage--frame" class="<?php echo $config['preview']['flip']; ?> <?php echo $config['preview']['style']; ?>" src="<?php echo $config['collage']['htmlframe']; ?>" alt="collageFrame" />
-    <video id="video--view" class="<?php echo $config['preview']['flip']; ?> <?php echo $config['preview']['style']; ?>"
-       autoplay playsinline></video>
+    <video id="video--view" class="<?php echo $config['preview']['flip']; ?> <?php echo $config['preview']['style']; ?>" autoplay playsinline></video>
 
     <div id="wrapper">
         <div id="ipcam--view" class="<?php echo $config['preview']['style']; ?>"></div>

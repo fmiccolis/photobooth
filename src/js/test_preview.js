@@ -1,7 +1,6 @@
 /* globals photoboothTools photoboothPreview */
 const photoboothPreviewTest = (function () {
-    const
-        CameraDisplayMode = {
+    const CameraDisplayMode = {
             INIT: 1,
             BACKGROUND: 2,
             COUNTDOWN: 3,
