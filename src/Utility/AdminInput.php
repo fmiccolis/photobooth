@@ -347,6 +347,13 @@ class AdminInput
         $languageService = LanguageService::getInstance();
         $fonts = '';
 
+        $attributes = '';
+        if (isset($setting['attributes'])) {
+            foreach ($setting['attributes'] as $key => $prop) {
+                $attributes .= $key . '="' . $prop . '" ';
+            }
+        }
+
         if (isset($setting['paths']) && is_array($setting['paths'])) {
             $pathIndex = 0;
             foreach ($setting['paths'] as $path) {
@@ -355,6 +362,7 @@ class AdminInput
                     <h2 class="font-bold">' . PathUtility::getPublicPath($path) . '</h2>
                 </div>
             ';
+                $fontClassName = 'font-' . $pathIndex;
                 try {
                     $files = FontUtility::getFontsFromPath($path, false);
                     $files = array_map(fn ($file): string => PathUtility::getPublicPath($file), $files);
@@ -365,14 +373,18 @@ class AdminInput
                         </div>
                     ';
                     }
-                    foreach ($files as $file) {
+                    $fontIndex = 0;
+                    foreach ($files as $name => $path) {
+                        $fontClassName .= '-' . $fontIndex;
                         $imageAttributes = [
-                            'onClick' => 'adminFontSelect(this, "' . $setting['name'] . '");',
-                            'data-origin' => $file,
-                            'title' => $file,
-                            'class' => 'w-full h-full left-0 top-0 absolute object-contain cursor-pointer'
+                            'onClick' => 'adminFontSelect(this, "' . $setting['name'] . '", "' . $fontClassName . '");',
+                            'data-origin' => $path,
+                            'title' => $name,
+                            'class' => 'w-full h-full left-0 top-0 absolute object-contain cursor-pointer',
                         ];
-                        $fonts .= '<div class="w-full relative h-0 pb-2/3">' . FontUtility::getFontPreviewImage(fontPath: $file, attributes: $imageAttributes) . '</div>';
+                        $fonts .= '<style>.' . $fontClassName . ' {font-family:"' . $name . '"}</style>';
+                        $fonts .= '<div class="w-full relative h-0 pb-2/3">' . FontUtility::getFontPreviewImage(fontPath: $path, attributes: $imageAttributes) . '</div>';
+                        $fontIndex++;
                     }
                 } catch (\Exception $e) {
                     $fonts .= '
@@ -419,6 +431,98 @@ class AdminInput
                         <div class="flex w-full h-full flex-col overflow-y-auto">
                             <div class="grid grid-cols-3 gap-4">
                                 ' . $fonts . '
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <input
+                    type="input"
+                    class="w-full h-10 border-2 border-solid border-gray-300 focus:border-brand-1 rounded-md px-3 mt-auto"
+                    name="' . $setting['name'] . '"
+                    value="' . $setting['value'] . '"
+					' . $attributes . '
+                />
+            </div>
+        ';
+    }
+
+    public static function renderVideoSelect(array $setting, string $label): string
+    {
+        $languageService = LanguageService::getInstance();
+        $videos = '';
+
+        if (isset($setting['paths']) && is_array($setting['paths'])) {
+            $pathIndex = 0;
+            foreach ($setting['paths'] as $path) {
+                $videos .= '
+                <div class="col-span-3">
+                    <h2 class="font-bold">' . PathUtility::getPublicPath($path) . '</h2>
+                </div>
+            ';
+                try {
+                    $files = VideoUtility::getVideosFromPath($path, false);
+                    $files = array_map(fn ($file): string => PathUtility::getPublicPath($file), $files);
+                    if (count($files) === 0) {
+                        $videos .= '
+                        <div class="col-span-3">
+                            <p>' . $languageService->translate('error_path_noVideos') . '</p>
+                        </div>
+                    ';
+                    }
+                    foreach ($files as $file) {
+                        $videoAttributes = [
+                            'onClick' => 'adminVideoSelect(this, "' . $setting['name'] . '");',
+                            'data-origin' => $file,
+                            'title' => $file,
+                            'class' => 'w-full h-full left-0 top-0 absolute object-contain cursor-pointer'
+                        ];
+                        $videos .= '<div class="w-full relative h-0 pb-2/3">' . VideoUtility::getVideoPreview(videoPath: $file, attributes: $videoAttributes) . '</div>';
+                    }
+                } catch (\Exception $e) {
+                    $videos .= '
+                    <div class="col-span-3">
+                        <p>' . $e->getMessage() . '</p>
+                    </div>
+                ';
+                }
+                $pathIndex++;
+            }
+        }
+
+        $selectedVideo = $setting['value'];
+        if (str_contains($setting['value'], 'url(')) {
+            $selectedVideo = substr($setting['value'], 4, -1);
+        }
+        if (str_contains($setting['value'], $_SERVER['DOCUMENT_ROOT'])) {
+            $selectedVideo = substr($setting['value'], strlen($_SERVER['DOCUMENT_ROOT']));
+        }
+
+        return '
+            <div class="adminVideoSelection group">
+                <div class="w-full flex items-start">
+                    <div class="w-24 flex mb-3 mr-3 shrink-0 cursor-pointer" onclick="openAdminVideoSelect(this)">
+                        ' . VideoUtility::getVideoPreview(videoPath: $selectedVideo, attributes: ['class' => 'adminVideoSelection-preview object-contain']) . '
+                    </div>
+                    <div class="w-full flex flex-col">
+                        ' . self::renderHeadline($label) . '
+                        <div class="adminVideoSelection-text text-xs mb-3 -mt-2 break-all">
+                            ' . $setting['value'] . '
+                        </div>
+                        ' . ($videos !== '' ? '<div class="w-full mb-3 h-10 bg-brand-1 text-white flex items-center justify-center rounded-full" onclick="openAdminVideoSelect(this)">' . $languageService->translate('choose_video') . '</div>' : '') . '
+                    </div>
+                </div>
+                <div class="hidden group-[&.isOpen]:grid w-full h-full fixed left-0 top-0 z-50 place-items-center">
+                    <div class="w-full h-full left-0 top-0 z-10 absolute bg-black bg-opacity-60 cursor-pointer" onclick="closeAdminVideoSelect()"></div>
+                    <div class="w-full max-h-3/4 max-w-2xl bg-white p-4 pt-2 rounded relative z-20 flex flex-col overflow-hidden">
+                        <div class="w-full flex items-center">
+                            <h2 class="flex text-brand-1 font-bold">
+                                ' . $languageService->translate('choose_video') . '
+                            </h2>
+                            <div class="ml-auto flex items-center justify-center p-3 text-xl fa fa-close" onclick="closeAdminVideoSelect()"></div>
+                        </div>
+                        <div class="flex w-full h-full flex-col overflow-y-auto">
+                            <div class="grid grid-cols-3 gap-4">
+                                ' . $videos . '
                             </div>
                         </div>
                     </div>
