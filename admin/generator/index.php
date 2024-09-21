@@ -707,26 +707,14 @@ AdminInput::renderColor(
                     <div id="collage_background" class="absolute h-full">
                         <img class="h-full hidden object-contain object-top" src="" alt="Choose the background">
                     </div>
-                    <div id="picture-0" class="absolute overflow-hidden w-full h-full">
-                        <img class="absolute object-left-top rotate-0 max-w-none" data-src="/resources/img/demo/seal-station-norddeich-01.jpg">
-                        <img class="picture-frame absolute object-left-top rotate-0 max-w-none hidden" />
-                    </div>
-                    <div id="picture-1" class="absolute overflow-hidden w-full h-full hidden">
-                        <img class="absolute object-left-top rotate-0 max-w-none" data-src="/resources/img/demo/seal-station-norddeich-02.jpg">
-                        <img class="picture-frame absolute object-left-top rotate-0 max-w-none hidden" />
-                    </div>
-                    <div id="picture-2" class="absolute overflow-hidden w-full h-full hidden">
-                        <img class="absolute object-left-top rotate-0 max-w-none" data-src="/resources/img/demo/seal-station-norddeich-03.jpg">
-                        <img class="picture-frame absolute object-left-top rotate-0 max-w-none hidden" />
-                    </div>
-                    <div id="picture-3" class="absolute overflow-hidden w-full h-full hidden">
-                        <img class="absolute object-left-top rotate-0 max-w-none" data-src="/resources/img/demo/seal-station-norddeich-04.jpg">
-                        <img class="picture-frame absolute object-left-top rotate-0 max-w-none hidden" />
-                    </div>
-                    <div id="picture-4" class="absolute overflow-hidden w-full h-full hidden">
-                        <img class="absolute object-left-top rotate-0 max-w-none" data-src="/resources/img/demo/seal-station-norddeich-05.jpg">
-                        <img class="picture-frame absolute object-left-top rotate-0 max-w-none hidden" />
-                    </div>
+                    <?php for ($i = 0; $i < 5; $i++) { 
+                        $hidden_class = ($i === 0) ? "" : " hidden";
+                    ?>
+                        <div id="picture-<?=$i?>" class="absolute overflow-hidden w-full h-full <?=$hidden_class?>">
+                            <img class="absolute object-left-top rotate-0 max-w-none" data-src="/resources/img/demo/seal-station-norddeich-0<?=($i+1)?>.jpg">
+                            <img class="picture-frame absolute object-left-top rotate-0 max-w-none hidden" />
+                        </div>
+                    <?php } ?>
                     <div id="collage_frame" class="absolute h-full w-full">
                         <img class="h-full w-full hidden" src="" alt="Choose the frame">
                     </div>
