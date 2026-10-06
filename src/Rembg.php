@@ -130,7 +130,6 @@ class Rembg
                         $logger->error('Failed to read background image file');
                     } else {
                         $backgroundImage = imagecreatefromstring($backgroundContent);
-                        $backgroundImage = imagecreatefromstring($backgroundContent);
                         if ($backgroundImage !== false) {
                             $backgroundMode = $rembgConfig['backgroundMode'] ?? 'scale-fill';
                             $newImage = self::applyBackgroundWithMode(
