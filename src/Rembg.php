@@ -26,11 +26,16 @@ class Rembg
 
         $logger->debug('Starting background removal process via service');
 
-        // Prepare temporary files
-        $tempInput = tempnam(sys_get_temp_dir(), 'rembg_input_') . '.png';
-        $tempOutput = tempnam(sys_get_temp_dir(), 'rembg_output_') . '.png';
+        $tempInput = false;
 
         try {
+            // Prepare temporary file. Use the file created by tempnam() itself, so
+            // no empty placeholder is left behind in the temp folder.
+            $tempInput = tempnam(sys_get_temp_dir(), 'rembg_input_');
+            if ($tempInput === false) {
+                throw new \Exception('Failed to create temporary input file');
+            }
+
             // Save image for upload. Use the lowest zlib compression level: the
             // file only travels to the local rembg service, and the default level
             // takes several seconds for a full-size photo on a Raspberry Pi.
@@ -110,13 +115,8 @@ class Rembg
 
             $logger->debug("Image successfully processed and returned from API (HTTP 200, MIME: $mimeType)");
 
-            // Save response as image
-            if (file_put_contents($tempOutput, $response) === false) {
-                throw new \Exception('Failed to save output image');
-            }
-
             // Load processed image
-            $processedImage = imagecreatefrompng($tempOutput);
+            $processedImage = imagecreatefromstring($response);
             if ($processedImage === false) {
                 throw new \Exception('Failed to load processed image');
             }
@@ -150,21 +150,15 @@ class Rembg
 
             $logger->debug('Background removal applied successfully via service');
 
-            // Cleanup
-            unlink($tempInput);
-            unlink($tempOutput);
-
             return [$imageHandler, $processedImage];
 
         } catch (\Exception $e) {
             $logger->error('Processing failed: ' . $e->getMessage());
-            if (file_exists($tempInput)) {
+            return [$imageHandler, $imageResource]; // Fallback to original image
+        } finally {
+            if ($tempInput !== false && file_exists($tempInput)) {
                 unlink($tempInput);
             }
-            if (file_exists($tempOutput)) {
-                unlink($tempOutput);
-            }
-            return [$imageHandler, $imageResource]; // Fallback to original image
         }
     }
 
