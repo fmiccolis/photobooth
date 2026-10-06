@@ -37,43 +37,41 @@ class Rembg
             }
 
             // Prepare API URL and parameters
+            // The rembg server reads the options of a POST request from the form
+            // fields only: query parameters are silently ignored and the server
+            // falls back to its default model (bria-rmbg), which is far slower.
             $apiUrl = 'http://localhost:7000/api/remove';
-            $queryParams = [];
+            $formParams = [];
             if (!empty($rembgConfig['model'])) {
-                $queryParams['model'] = $rembgConfig['model'];
+                $formParams['model'] = $rembgConfig['model'];
             }
             if (!empty($rembgConfig['alpha_matting'])) {
-                $queryParams['a'] = 'true';
+                $formParams['a'] = 'true';
                 if (!empty($rembgConfig['alpha_matting_background_threshold'])) {
-                    $queryParams['ab'] = $rembgConfig['alpha_matting_background_threshold'];
+                    $formParams['ab'] = (string) $rembgConfig['alpha_matting_background_threshold'];
                 }
                 if (!empty($rembgConfig['alpha_matting_erode_size'])) {
-                    $queryParams['ae'] = $rembgConfig['alpha_matting_erode_size'];
+                    $formParams['ae'] = (string) $rembgConfig['alpha_matting_erode_size'];
                 }
                 if (!empty($rembgConfig['alpha_matting_foreground_threshold'])) {
-                    $queryParams['af'] = $rembgConfig['alpha_matting_foreground_threshold'];
+                    $formParams['af'] = (string) $rembgConfig['alpha_matting_foreground_threshold'];
                 }
             }
             if (!empty($rembgConfig['post_processing'])) {
-                $queryParams['ppm'] = 'true';
-            }
-
-            // Build query string
-            if (!empty($queryParams)) {
-                $apiUrl .= '?' . http_build_query($queryParams);
+                $formParams['ppm'] = 'true';
             }
 
             // Log: Image sent to API + parameters
-            $paramString = json_encode($queryParams);
+            $paramString = json_encode($formParams);
             $logger->debug("Image sent to API: $apiUrl with parameters: $paramString");
 
             // cURL request
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $apiUrl);
             curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, [
+            curl_setopt($ch, CURLOPT_POSTFIELDS, array_merge([
                 'file' => new \CURLFile($tempInput, 'image/png', 'input.png')
-            ]);
+            ], $formParams));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_TIMEOUT, 60);
             $response = curl_exec($ch);
