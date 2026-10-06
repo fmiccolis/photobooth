@@ -31,8 +31,10 @@ class Rembg
         $tempOutput = tempnam(sys_get_temp_dir(), 'rembg_output_') . '.png';
 
         try {
-            // Save image for upload
-            if (!imagepng($imageResource, $tempInput)) {
+            // Save image for upload. Use the lowest zlib compression level: the
+            // file only travels to the local rembg service, and the default level
+            // takes several seconds for a full-size photo on a Raspberry Pi.
+            if (!imagepng($imageResource, $tempInput, 1)) {
                 throw new \Exception('Failed to save input image');
             }
 
