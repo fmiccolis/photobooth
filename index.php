@@ -78,6 +78,9 @@ $stageStart = PathUtility::getAbsolutePath('template/components/stage.start.php'
 include file_exists($privateStageStart) ? $privateStageStart : $stageStart;
 if (!$config['ui']['selfie_mode']) {
     include PathUtility::getAbsolutePath('template/components/stage.loader.php');
+    if ($config['rembg']['enabled'] && $config['rembg']['select_background']) {
+        include PathUtility::getAbsolutePath('template/components/stage.background.php');
+    }
     include PathUtility::getAbsolutePath('template/components/stage.results.php');
 }
 

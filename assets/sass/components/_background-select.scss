@@ -1,0 +1,88 @@
+/**
+ * Background selection after taking a photo (rembg)
+ */
+.stage--background {
+  --stage-color: var(--stage-result-color);
+  --stage-background: var(--stage-result-background);
+
+  .stage-inner {
+    justify-content: flex-start;
+  }
+}
+
+.background-select {
+  &__title {
+    flex-shrink: 0;
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  &__preview {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 0;
+
+    canvas {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+    }
+  }
+
+  &__list {
+    display: flex;
+    flex-shrink: 0;
+    gap: 0.75rem;
+    max-width: 100%;
+    padding: 0.25rem;
+    overflow-x: auto;
+  }
+
+  &__buttons {
+    flex-shrink: 0;
+  }
+
+  &__option {
+    position: relative;
+    flex: 0 0 auto;
+    padding: 0;
+    overflow: hidden;
+    cursor: pointer;
+    background: none;
+    border: 0.25rem solid transparent;
+    border-radius: 0.5rem;
+
+    &--active {
+      border-color: var(--button-color);
+    }
+
+    &.focused,
+    &:focus-visible {
+      outline: 0.25rem dashed var(--button-color);
+      outline-offset: 0.125rem;
+    }
+  }
+
+  &__thumb {
+    display: block;
+    width: 9rem;
+    height: 6rem;
+    object-fit: cover;
+  }
+
+  &__label {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 0.25rem;
+    font-size: 0.9rem;
+    color: #fff;
+    text-align: center;
+    background: rgb(0 0 0 / 50%);
+  }
+}

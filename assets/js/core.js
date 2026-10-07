@@ -32,7 +32,8 @@ const photoBooth = (function () {
             OFF: 'off',
             ALWAYS: 'always',
             ONCE: 'once'
-        };
+        },
+        BACKGROUND_ORIGINAL = 'original';
 
     const api = {},
         startPage = $('.stage[data-stage="start"]'),
@@ -41,6 +42,8 @@ const photoBooth = (function () {
         loaderMessage = loader.find('.stage-message'),
         loaderImage = loader.find('.stage-image'),
         resultPage = $('.stage[data-stage="result"]'),
+        backgroundStage = $('.stage[data-stage="background"]'),
+        usesBackgroundSelection = config.rembg.enabled && config.rembg.select_background && backgroundStage.length > 0,
         screensaverOverlay = $('#screensaver-overlay'),
         screensaverVideo = $('#screensaver-video'),
         screensaverImage = $('#screensaver-image'),
@@ -99,6 +102,8 @@ const photoBooth = (function () {
     api.collageLimit = config.collage.limit;
     api.remoteUploadFiles = [];
     api.uploadStatusTimer = null;
+    // background chosen by the guest for the current photo (rembg background selection)
+    api.selectedBackground = null;
 
     api.isTimeOutPending = function () {
         return typeof timeOut !== 'undefined';
@@ -128,6 +133,7 @@ const photoBooth = (function () {
         loaderMessage.removeClass('stage-message--error');
         resultPage.removeAttr('style data-img');
         resultPage.removeClass('stage--active');
+        backgroundStage.removeClass('stage--active');
         gallery.removeClass('gallery--open');
         gallery.find('.gallery__inner').hide();
         previewVideo.hide();
@@ -511,6 +517,7 @@ const photoBooth = (function () {
             api.reset();
             api.closeGallery();
             api.clearLoaderImage();
+            api.selectedBackground = null;
 
             remoteBuzzerClient.inProgress(photoStyle);
             api.takingPic = true;
@@ -834,7 +841,14 @@ const photoBooth = (function () {
                         currentCollageFile = '';
                         api.nextCollageNumber = 0;
 
-                        api.processPic(result);
+                        if (
+                            usesBackgroundSelection &&
+                            (api.photoStyle === PhotoStyle.PHOTO || api.photoStyle === PhotoStyle.CUSTOM)
+                        ) {
+                            api.selectBackground(result);
+                        } else {
+                            api.processPic(result);
+                        }
                     }
                 } catch (error) {
                     photoboothTools.console.log('callTakePicApi.done: unexpected error:', error);
@@ -983,6 +997,203 @@ const photoBooth = (function () {
         }, 500);
     };
 
+    // Draw a background the same way Rembg::applyBackgroundWithMode() does on the
+    // server, so the preview matches the processed photo.
+    const drawBackground = function (context, image, mode, width, height) {
+        const imageWidth = image.naturalWidth;
+        const imageHeight = image.naturalHeight;
+        const drawCentered = (scale) => {
+            const scaledWidth = imageWidth * scale;
+            const scaledHeight = imageHeight * scale;
+            context.drawImage(image, (width - scaledWidth) / 2, (height - scaledHeight) / 2, scaledWidth, scaledHeight);
+        };
+
+        context.fillStyle = '#000';
+        context.fillRect(0, 0, width, height);
+        switch (mode) {
+            case 'none':
+                context.drawImage(image, 0, 0);
+                break;
+            case 'scale-fit':
+                drawCentered(Math.min(width / imageWidth, height / imageHeight));
+                break;
+            case 'scale-fill':
+                drawCentered(Math.max(width / imageWidth, height / imageHeight));
+                break;
+            case 'crop-center':
+                if (imageWidth < width || imageHeight < height) {
+                    drawCentered(Math.max(width / imageWidth, height / imageHeight));
+                } else {
+                    drawCentered(1);
+                }
+                break;
+            default:
+                context.drawImage(image, 0, 0, width, height);
+                break;
+        }
+    };
+
+    // Rembg background selection: remove the background once, then let the guest
+    // choose the background before the photo gets processed.
+    api.selectBackground = function (result) {
+        const continueWithoutSelection = (reason) => {
+            photoboothTools.console.log('Background selection not available, processing the original photo:', reason);
+            api.selectedBackground = BACKGROUND_ORIGINAL;
+            api.processPic(result);
+        };
+
+        loader.addClass('stage--active');
+        loaderMessage.html(
+            '<i class="' + config.icons.spinner + '"></i><br>' + photoboothTools.getTranslation('removingBackground')
+        );
+        const tempImageUrl = environment.publicFolders.tmp + '/' + result.file;
+        const preloadImage = new Image();
+        preloadImage.onload = () => {
+            loader.css('background-image', `url(${tempImageUrl})`);
+            loader.addClass('showBackgroundImage');
+        };
+        preloadImage.src = tempImageUrl;
+
+        photoboothTools
+            .ajaxWithCsrf({
+                method: 'POST',
+                url: environment.publicFolders.api + '/rembgCutout.php',
+                data: {
+                    file: result.file
+                }
+            })
+            .done((data) => {
+                if (data.error) {
+                    continueWithoutSelection(data.error);
+                    return;
+                }
+                api.showBackgroundSelection(result, data, continueWithoutSelection);
+            })
+            .fail((jqXHR, textStatus) => {
+                if (photoboothTools.isCsrfErrorResponse(jqXHR)) {
+                    photoboothTools.handleCsrfMismatch(environment.publicFolders.api + '/rembgCutout.php');
+                    return;
+                }
+                continueWithoutSelection('Request failed: ' + textStatus);
+            });
+    };
+
+    api.showBackgroundSelection = function (result, data, continueWithoutSelection) {
+        const canvas = document.getElementById('backgroundSelectCanvas');
+        const context = canvas.getContext('2d');
+        const options = backgroundStage.find('.background-select__option');
+        const backgroundImages = {};
+        const cutout = new Image();
+        const original = new Image();
+        let pending = 2;
+
+        const draw = (background) => {
+            if (background === BACKGROUND_ORIGINAL) {
+                context.drawImage(original, 0, 0, canvas.width, canvas.height);
+                return;
+            }
+            const render = (image) => {
+                // ignore backgrounds that finished loading after another choice
+                if (api.selectedBackground !== background) {
+                    return;
+                }
+                drawBackground(context, image, config.rembg.backgroundMode, canvas.width, canvas.height);
+                context.drawImage(cutout, 0, 0, canvas.width, canvas.height);
+            };
+            if (backgroundImages[background] && backgroundImages[background].complete) {
+                render(backgroundImages[background]);
+                return;
+            }
+            const image = new Image();
+            image.onload = () => render(image);
+            image.src = options
+                .filter((index, option) => $(option).attr('data-background') === background)
+                .find('img')
+                .attr('src');
+            backgroundImages[background] = image;
+        };
+
+        const select = (background) => {
+            api.selectedBackground = background;
+            options.removeClass('background-select__option--active');
+            options
+                .filter((index, option) => $(option).attr('data-background') === background)
+                .addClass('background-select__option--active');
+            draw(background);
+        };
+
+        const show = () => {
+            canvas.width = cutout.naturalWidth;
+            canvas.height = cutout.naturalHeight;
+            backgroundStage.find('[data-background="' + BACKGROUND_ORIGINAL + '"] img').attr('src', data.original);
+
+            options.off('click').on('click', function (event) {
+                event.preventDefault();
+                select($(this).attr('data-background'));
+            });
+            backgroundStage
+                .find('[data-command="background-confirm"]')
+                .off('click')
+                .on('click', (event) => {
+                    event.preventDefault();
+                    backgroundStage.removeClass('stage--active');
+                    api.processPic(result);
+                });
+            backgroundStage
+                .find('[data-command="background-cancel"]')
+                .off('click')
+                .on('click', (event) => {
+                    event.preventDefault();
+                    // the captured photo stays in the temp folder, only the files
+                    // prepared for the selection are removed
+                    photoboothTools
+                        .ajaxWithCsrf({
+                            method: 'POST',
+                            url: environment.publicFolders.api + '/rembgCutout.php',
+                            data: {
+                                file: result.file,
+                                action: 'discard'
+                            }
+                        })
+                        .always(() => {
+                            photoboothTools.reloadPage();
+                        });
+                });
+
+            select(
+                config.rembg.select_background_original || options.length === 0
+                    ? BACKGROUND_ORIGINAL
+                    : options.first().attr('data-background')
+            );
+
+            loader.removeClass('stage--active showBackgroundImage');
+            loader.css('background-image', '');
+            loaderMessage.empty();
+            backgroundStage.addClass('stage--active');
+            rotaryController.focusSet(backgroundStage);
+        };
+
+        const onLoad = () => {
+            pending -= 1;
+            if (pending === 0) {
+                show();
+            }
+        };
+        const onError = () => {
+            cutout.onload = null;
+            original.onload = null;
+            cutout.onerror = null;
+            original.onerror = null;
+            continueWithoutSelection('Failed to load the cutout images');
+        };
+        cutout.onload = onLoad;
+        original.onload = onLoad;
+        cutout.onerror = onError;
+        original.onerror = onError;
+        cutout.src = data.cutout;
+        original.src = data.original;
+    };
+
     api.processPic = function (result) {
         startTime = new Date().getTime();
         if (api.uploadStatusTimer) {
@@ -1024,7 +1235,8 @@ const photoBooth = (function () {
                     filter: imgFilter,
                     style: api.photoStyle,
                     collageLayout: api.collageLayout,
-                    collageLimit: api.collageLimit
+                    collageLimit: api.collageLimit,
+                    background: api.selectedBackground
                 }
             })
             .done((data) => {

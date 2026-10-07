@@ -54,6 +54,24 @@ try {
 
     $vars['style'] = $_POST['style'];
 
+    // Background chosen by the guest after the photo was taken (rembg
+    // background selection): a selectable background or the original photo.
+    $vars['background'] = null;
+    if (!empty($_POST['background'])) {
+        $background = (string) $_POST['background'];
+        if (
+            !$config['rembg']['enabled'] ||
+            !$config['rembg']['select_background'] ||
+            !in_array($vars['style'], ['photo', 'custom'], true)
+        ) {
+            throw new \Exception('Background selection is not available.');
+        }
+        if ($background !== Rembg::BACKGROUND_ORIGINAL && !Rembg::isSelectableBackground($background)) {
+            throw new \Exception('Invalid background provided');
+        }
+        $vars['background'] = $background;
+    }
+
     $vars['imageFilter'] = null;
     if (!isset($_POST['filter'])) {
         $logger->debug('No filter provided.');
@@ -140,61 +158,73 @@ try {
             }
 
             if (!$vars['isCollage'] || $vars['editSingleCollage']) {
-                $filterProcessSize = intval($config['filters']['process_size'] ?? 0);
-
-                // only downscale if filter not plain, rembg is enabled
-                $originalResource = null;
-                if ($vars['imageFilter'] !== ImageFilterEnum::PLAIN || $config['rembg']['enabled']) {
-                    $originalWidth    = imagesx($imageResource);
-                    $originalHeight   = imagesy($imageResource);
-                    $originalResource = $imageResource;
-
-                    if ($filterProcessSize > 0 && ($originalWidth > $filterProcessSize || $originalHeight > $filterProcessSize)) {
-                        $downscaledResource = $imageHandler->resizeImage($imageResource, $filterProcessSize);
-                        if ($downscaledResource instanceof \GdImage) {
-                            $imageResource = $downscaledResource;
-                        }
+                if ($vars['background'] !== null && $vars['background'] !== Rembg::BACKGROUND_ORIGINAL) {
+                    // Background chosen by the guest: put the cut out subject, prepared
+                    // by api/rembgCutout.php and already flipped/rotated, in front of it.
+                    // The filter is applied afterwards so it covers the whole picture.
+                    $cutoutFile = Rembg::getCutoutFile($vars['singleImageFile']);
+                    if (!file_exists($cutoutFile)) {
+                        Rembg::createCutout($imageHandler, $vars['singleImageFile'], $config);
                     }
-                }
-
-                // apply filter (optionally downscale first for performance)
-                if ($vars['imageFilter'] !== null && $vars['imageFilter'] !== ImageFilterEnum::PLAIN) {
-                    try {
-                        ImageUtility::applyFilter($vars['imageFilter'], $imageResource);
-                        $imageHandler->imageModified = true;
-                    } catch (\Exception $e) {
-                        throw new \Exception('Error applying image filter.');
+                    $cutoutResource = $imageHandler->createFromImage($cutoutFile);
+                    if (!$cutoutResource instanceof \GdImage) {
+                        throw new \Exception('Error loading cutout image.');
                     }
-
-                }
-
-                if ($config['picture']['flip'] !== 'off') {
-                    try {
-                        if ($config['picture']['flip'] === 'flip-horizontal') {
-                            imageflip($imageResource, IMG_FLIP_HORIZONTAL);
-                        } elseif ($config['picture']['flip'] === 'flip-vertical') {
-                            imageflip($imageResource, IMG_FLIP_VERTICAL);
-                        } elseif ($config['picture']['flip'] === 'flip-both') {
-                            imageflip($imageResource, IMG_FLIP_BOTH);
-                        }
-                        $imageHandler->imageModified = true;
-                    } catch (\Exception $e) {
-                        throw new \Exception('Error flipping image.');
-                    }
-                }
-
-                if ((int)$config['picture']['rotation'] !== 0) {
-                    $imageResource = $imageHandler->rotateResizeImage(
-                        image: $imageResource,
-                        degrees: (int)$config['picture']['rotation'],
+                    $imageResource = Rembg::applyBackgroundImage(
+                        $cutoutResource,
+                        PathUtility::getAbsolutePath($vars['background']),
+                        $config['rembg']['backgroundMode']
                     );
-                    if (!$imageResource instanceof \GdImage) {
-                        throw new \Exception('Error resizing resource.');
+                    unset($cutoutResource);
+                    $imageHandler->imageModified = true;
+
+                    if ($vars['imageFilter'] !== null && $vars['imageFilter'] !== ImageFilterEnum::PLAIN) {
+                        try {
+                            ImageUtility::applyFilter($vars['imageFilter'], $imageResource);
+                        } catch (\Exception $e) {
+                            throw new \Exception('Error applying image filter.');
+                        }
+                    }
+                } else {
+                    $filterProcessSize = intval($config['filters']['process_size'] ?? 0);
+
+                    // only downscale if filter not plain, rembg is enabled
+                    $originalResource = null;
+                    if ($vars['imageFilter'] !== ImageFilterEnum::PLAIN || $config['rembg']['enabled']) {
+                        $originalWidth    = imagesx($imageResource);
+                        $originalHeight   = imagesy($imageResource);
+                        $originalResource = $imageResource;
+
+                        if ($filterProcessSize > 0 && ($originalWidth > $filterProcessSize || $originalHeight > $filterProcessSize)) {
+                            $downscaledResource = $imageHandler->resizeImage($imageResource, $filterProcessSize);
+                            if ($downscaledResource instanceof \GdImage) {
+                                $imageResource = $downscaledResource;
+                            }
+                        }
+                    }
+
+                    // apply filter (optionally downscale first for performance)
+                    if ($vars['imageFilter'] !== null && $vars['imageFilter'] !== ImageFilterEnum::PLAIN) {
+                        try {
+                            ImageUtility::applyFilter($vars['imageFilter'], $imageResource);
+                            $imageHandler->imageModified = true;
+                        } catch (\Exception $e) {
+                            throw new \Exception('Error applying image filter.');
+                        }
+
+                    }
+
+                    $imageResource = $imageHandler->applyOrientation(
+                        $imageResource,
+                        (string) $config['picture']['flip'],
+                        (int) $config['picture']['rotation']
+                    );
+
+                    // Apply rembg, unless the guest chose to keep the original photo
+                    if ($vars['background'] !== Rembg::BACKGROUND_ORIGINAL) {
+                        [$imageHandler, $imageResource] = Rembg::process($imageHandler, $vars, $config['rembg'], $imageResource);
                     }
                 }
-
-                // Apply rembg
-                [$imageHandler, $imageResource] = Rembg::process($imageHandler, $vars, $config['rembg'], $imageResource);
 
                 if ($config['picture']['polaroid_effect']) {
                     $imageHandler->polaroidRotation = $config['picture']['polaroid_rotation'];
@@ -355,6 +385,8 @@ try {
             if (!unlink($vars['tmpFile'])) {
                 $imageHandler->addErrorData('Warning: Failed to remove temporary photo.');
             }
+            // without the temporary photo the result can't be processed again
+            Rembg::deleteCutout($vars['singleImageFile']);
         }
 
         if ($_POST['style'] === 'chroma' && $config['keying']['show_all'] === false) {

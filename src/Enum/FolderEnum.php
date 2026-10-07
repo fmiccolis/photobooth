@@ -18,6 +18,7 @@ enum FolderEnum: string
     case TEST = 'data/test';
     case THUMBS = 'data/thumbs';
     case TEMP = 'data/tmp';
+    case CUTOUT = 'data/tmp/cutout';
     case LANG = 'resources/lang';
     case PRIVATE = 'private';
     case RESOURCES = 'resources';
@@ -46,6 +47,7 @@ enum FolderEnum: string
             FolderEnum::TEST => 'test',
             FolderEnum::THUMBS => 'thumbs',
             FolderEnum::TEMP => 'tmp',
+            FolderEnum::CUTOUT => 'cutout',
             FolderEnum::LANG => 'lang',
             FolderEnum::PRIVATE => 'private',
             FolderEnum::RESOURCES => 'resources',

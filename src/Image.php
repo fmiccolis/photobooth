@@ -485,6 +485,36 @@ class Image
     }
 
     /**
+     * Apply the configured picture orientation: flip first, then rotation, in
+     * the same order used when a captured photo gets processed.
+     */
+    public function applyOrientation(GdImage $image, string $flip, int $degrees): GdImage
+    {
+        $flipMode = match ($flip) {
+            'flip-horizontal' => IMG_FLIP_HORIZONTAL,
+            'flip-vertical' => IMG_FLIP_VERTICAL,
+            'flip-both' => IMG_FLIP_BOTH,
+            default => null,
+        };
+        if ($flipMode !== null) {
+            if (!imageflip($image, $flipMode)) {
+                throw new \Exception('Error flipping image.');
+            }
+            $this->imageModified = true;
+        }
+
+        if ($degrees !== 0) {
+            $rotated = $this->rotateResizeImage(image: $image, degrees: $degrees);
+            if (!$rotated instanceof GdImage) {
+                throw new \Exception('Error resizing resource.');
+            }
+            $image = $rotated;
+        }
+
+        return $image;
+    }
+
+    /**
      * Rotate and resize an image.
      */
     public function rotateResizeImage(GdImage $image, int $degrees, string $bgColor = '#ffffff', bool $useTransparentBackground = false): GdImage|false

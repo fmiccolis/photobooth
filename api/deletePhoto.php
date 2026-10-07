@@ -6,6 +6,7 @@ require_once '../lib/boot.php';
 
 use Photobooth\Enum\FolderEnum;
 use Photobooth\FileDelete;
+use Photobooth\Rembg;
 use Photobooth\Service\DatabaseManagerService;
 use Photobooth\Service\ImageMetadataCacheService;
 use Photobooth\Service\LoggerService;
@@ -70,6 +71,7 @@ ImageMetadataCacheService::getInstance()->remove(FolderEnum::THUMBS->absolute() 
 foreach ($filesToDelete as $fileName) {
     $delete = new FileDelete($fileName, $paths, (bool) $config['picture']['keep_original']);
     $delete->deleteFiles();
+    Rembg::deleteCutout($fileName);
     $singleLogData = $delete->getLogData();
     $logData['files'][$fileName] = $singleLogData;
     if (!$singleLogData['success']) {

@@ -13,6 +13,8 @@ final class RembgConfiguration
             ->ignoreExtraKeys()
             ->children()
                 ->booleanNode('enabled')->defaultValue(false)->end()
+                ->booleanNode('select_background')->defaultValue(false)->end()
+                ->booleanNode('select_background_original')->defaultValue(true)->end()
                 ->scalarNode('background')->defaultValue('')->end()
                 ->enumNode('backgroundMode')
                     ->values(['none', 'scale-fit', 'scale-fill', 'crop-center', 'stretch'])
