@@ -75,6 +75,20 @@ try {
     $printWidth = imagesx($source);
     $printHeight = imagesy($source);
 
+    // Area of the QR code in percent of the print, used to drag it on the preview
+    $qr = null;
+    if ($config['print']['qrcode'] && $imageHandler->qrBox !== []) {
+        $box = $imageHandler->qrBox;
+        $qr = [
+            'x' => $box['x'] / $printWidth * 100,
+            'y' => $box['y'] / $printHeight * 100,
+            'width' => $box['width'] / $printWidth * 100,
+            'height' => $box['height'] / $printHeight * 100,
+            'scale' => $box['width'] / min($printWidth, $printHeight) * 100,
+            'minScale' => PrintImageUtility::QR_MIN_PIXEL_SIZE / min($printWidth, $printHeight) * 100,
+        ];
+    }
+
     $preview = $source;
     if (max($printWidth, $printHeight) > $previewMaxSize) {
         $preview = $imageHandler->resizeImage($source, $previewMaxSize);
@@ -95,6 +109,7 @@ try {
         'width' => $printWidth,
         'height' => $printHeight,
         'source' => $fileName,
+        'qr' => $qr,
         // Steps which failed silently and would be skipped on the real print as well
         'warnings' => array_values(array_map(static fn ($error): string => is_array($error) ? (string) json_encode($error) : (string) $error, $imageHandler->errorLog)),
     ]);

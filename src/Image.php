@@ -272,6 +272,28 @@ class Image
     public int $qrSize = 4;
 
     /**
+     * The size of the QR code in pixels. If greater than 0 it is used instead of $qrSize.
+     */
+    public int $qrPixelSize = 0;
+
+    /**
+     * The left edge of the QR code in percent of the image width, used for the 'custom' position.
+     */
+    public float $qrX = 0;
+
+    /**
+     * The top edge of the QR code in percent of the image height, used for the 'custom' position.
+     */
+    public float $qrY = 0;
+
+    /**
+     * The area covered by the QR code after applyQr(), as ['x', 'y', 'width', 'height'] in pixels.
+     *
+     * @var array<string,int>
+     */
+    public array $qrBox = [];
+
+    /**
      * @var int $qrMargin The margin size around the QR code, must be in range between 0 and 10.
      */
     public int $qrMargin = 4;
@@ -1182,14 +1204,19 @@ class Image
                 throw new \Exception('No URL for QR-Code generation defined.');
             }
 
-            if (!is_numeric($this->qrSize)) {
-                throw new \Exception('QR-Size is not numeric.');
-            }
-            if ($this->qrSize % 2 != 0) {
-                throw new \Exception('QR-Size is not even.');
-            }
-            if ($this->qrSize < 2 || $this->qrSize > 10) {
-                throw new \Exception('QR-Size must be 2, 4, 6, 8 or 10.');
+            if ($this->qrPixelSize > 0) {
+                $size = $this->qrPixelSize;
+            } else {
+                if (!is_numeric($this->qrSize)) {
+                    throw new \Exception('QR-Size is not numeric.');
+                }
+                if ($this->qrSize % 2 != 0) {
+                    throw new \Exception('QR-Size is not even.');
+                }
+                if ($this->qrSize < 2 || $this->qrSize > 10) {
+                    throw new \Exception('QR-Size must be 2, 4, 6, 8 or 10.');
+                }
+                $size = $this->qrSize * 40;
             }
 
             if (!is_numeric($this->qrMargin)) {
@@ -1199,7 +1226,6 @@ class Image
                 throw new \Exception('QR-Size must be in range between 0 and 10.');
             }
 
-            $size = $this->qrSize * 40;
             $margin = (int)($size / 100 * $this->qrMargin);
             $result = QrCodeUtility::create($this->qrUrl, '', $size, $margin);
             $qrCodeImage = imagecreatefromstring($result->getString());
@@ -1335,15 +1361,22 @@ class Image
                     $x = $offset;
                     $y = ($height - $qrHeight) / 2;
                     break;
+                case 'custom':
+                    $x = max(0, min((int) round($width * $this->qrX / 100), $width - $qrWidth));
+                    $y = max(0, min((int) round($height * $this->qrY / 100), $height - $qrHeight));
+                    break;
                 default:
                     $x = $width - ($qrWidth + $offset);
                     $y = $height - ($qrHeight + $offset);
                     break;
             }
 
+            $x = (int) $x;
+            $y = (int) $y;
             if (!imagecopy($imageResource, $qrCode, $x, $y, 0, 0, $qrWidth, $qrHeight)) {
                 throw new \Exception('Can not apply QR Code onto image.');
             }
+            $this->qrBox = ['x' => $x, 'y' => $y, 'width' => $qrWidth, 'height' => $qrHeight];
             // Try to clear cache
             if ($qrCode instanceof GdImage) {
                 unset($qrCode);

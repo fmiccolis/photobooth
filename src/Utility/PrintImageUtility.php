@@ -6,11 +6,16 @@ use GdImage;
 use Photobooth\Image;
 
 /**
- * Builds the image that is sent to the printer (rotation, frame, QR code, text and crop).
+ * Builds the image that is sent to the printer (rotation, crop, frame, QR code and text).
  * Shared by the print API and the print preview in the admin panel so both always match.
  */
 class PrintImageUtility
 {
+    /**
+     * Smallest QR code size in pixels for the 'custom' position, below it phones can't scan it anymore.
+     */
+    public const QR_MIN_PIXEL_SIZE = 32;
+
     /**
      * Applies the print layout configured in the print and textonprint sections to the source image.
      */
@@ -24,6 +29,14 @@ class PrintImageUtility
             $imageHandler->qrRotate = true;
             if (!$source) {
                 throw new \Exception('Cannot rotate image resource.');
+            }
+        }
+
+        // Crop first, so frame, QR code and text are placed on the final print size and never cut off
+        if ($config['print']['crop']) {
+            $source = $imageHandler->resizeCropImage($source, $config['print']['crop_width'], $config['print']['crop_height']);
+            if (!$source instanceof GdImage) {
+                throw new \Exception('Failed to crop image resource.');
             }
         }
 
@@ -43,6 +56,14 @@ class PrintImageUtility
             $imageHandler->qrColor = $config['print']['qrBgColor'];
             $imageHandler->qrOffset = (int) $config['print']['qrOffset'];
             $imageHandler->qrPosition = $config['print']['qrPosition'];
+            $imageHandler->qrPixelSize = 0;
+            if ($config['print']['qrPosition'] === 'custom') {
+                // Position and size relative to the print, so they work with any camera resolution
+                $shortSide = min(imagesx($source), imagesy($source));
+                $imageHandler->qrPixelSize = max(self::QR_MIN_PIXEL_SIZE, (int) round($shortSide * (float) $config['print']['qrScale'] / 100));
+                $imageHandler->qrX = (float) $config['print']['qrX'];
+                $imageHandler->qrY = (float) $config['print']['qrY'];
+            }
 
             $qrCode = $imageHandler->createQr();
             if (!$qrCode instanceof GdImage) {
@@ -70,13 +91,6 @@ class PrintImageUtility
             $source = $imageHandler->applyText($source);
             if (!$source instanceof GdImage) {
                 throw new \Exception('Failed to apply text to image resource.');
-            }
-        }
-
-        if ($config['print']['crop']) {
-            $source = $imageHandler->resizeCropImage($source, $config['print']['crop_width'], $config['print']['crop_height']);
-            if (!$source instanceof GdImage) {
-                throw new \Exception('Failed to crop image resource.');
             }
         }
 
