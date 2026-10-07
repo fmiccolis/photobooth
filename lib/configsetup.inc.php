@@ -1345,6 +1345,20 @@ return [
             'data-theme-field' => 'true',
             'value' => $config['rembg']['enabled'],
         ],
+        'rembg_select_background' => [
+            'view' => 'basic',
+            'type' => 'checkbox',
+            'name' => 'rembg[select_background]',
+            'data-theme-field' => 'true',
+            'value' => $config['rembg']['select_background'],
+        ],
+        'rembg_select_background_original' => [
+            'view' => 'basic',
+            'type' => 'checkbox',
+            'name' => 'rembg[select_background_original]',
+            'data-theme-field' => 'true',
+            'value' => $config['rembg']['select_background_original'],
+        ],
         'rembg_background' => [
             'view' => 'basic',
             'type' => 'image',

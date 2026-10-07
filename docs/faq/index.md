@@ -594,6 +594,22 @@ Once enabled, Magic Greenscreen will automatically process photos after they are
 3. The processed image will be saved with a transparent or custom background
 4. Both original and processed images are available in the gallery
 
+### Let guests choose the background
+
+Enable "Let guests choose the background" in the "Magic Greenscreen" section to let guests pick the background themselves after taking a single photo:
+
+1. After the photo is taken, the background is removed once (the guest sees the photo and a "Removing the background" message).
+2. A selection screen shows a preview and the available backgrounds. Switching background is instant, the preview matches the final photo.
+3. "Confirm" processes the photo with the chosen background, then filter, frame and text are applied as usual. The filter applies to the whole photo, background included. Changing the filter on the result page does not run the background removal again.
+4. "Abort" returns to the start screen. The captured photo stays in `data/tmp` but is not processed nor added to the gallery.
+
+Notes:
+
+- Backgrounds are read from `private/images/keyingBackgrounds` (you can upload images there from the admin panel). If that folder is empty, the example backgrounds of Photobooth are offered.
+- "Offer the original photo as a choice" adds the original photo (background not replaced) as first, preselected option.
+- The configured background scaling mode is used for the preview and for the final photo. Flip and rotation of the picture are applied to the guest only, so a background is never mirrored.
+- Collages and videos are not affected. If the background removal fails, the original photo is processed.
+
 ### Supported Formats
 
 - Input: JPEG, PNG, and other common image formats

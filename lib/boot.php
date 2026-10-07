@@ -121,6 +121,7 @@ FileUtility::createDirectory(FolderEnum::QR->absolute());
 FileUtility::createDirectory(FolderEnum::TEST->absolute());
 FileUtility::createDirectory(FolderEnum::THUMBS->absolute());
 FileUtility::createDirectory(FolderEnum::TEMP->absolute());
+FileUtility::createDirectory(FolderEnum::CUTOUT->absolute());
 FileUtility::createDirectory(FolderEnum::PRIVATE->absolute());
 FileUtility::createDirectory(PathUtility::getAbsolutePath('private/fonts'));
 FileUtility::createDirectory(PathUtility::getAbsolutePath('private/screensavers'));
