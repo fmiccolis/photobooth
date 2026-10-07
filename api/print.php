@@ -9,8 +9,8 @@ use Photobooth\Image;
 use Photobooth\Processor\PrintProcessor;
 use Photobooth\Service\LoggerService;
 use Photobooth\Service\PrintManagerService;
-use Photobooth\Service\RemoteStorageService;
 use Photobooth\Utility\PathUtility;
+use Photobooth\Utility\PrintImageUtility;
 
 header('Content-Type: application/json');
 
@@ -130,80 +130,7 @@ if (!file_exists($vars['printFile'])) {
             [$imageHandler, $vars, $config, $source] = $processor->preProcessing($imageHandler, $vars, $config, $source);
         }
 
-        // rotate image if needed
-        if (imagesx($source) > imagesy($source) || $config['print']['no_rotate'] === true) {
-            $imageHandler->qrRotate = false;
-        } else {
-            $source = imagerotate($source, 90, 0);
-            $imageHandler->qrRotate = true;
-            if (!$source) {
-                throw new \Exception('Cannot rotate image resource.');
-            }
-        }
-
-        if ($config['print']['print_frame']) {
-            $imageHandler->framePath = $config['print']['frame'];
-            $imageHandler->frameExtend = false;
-            $source = $imageHandler->applyFrame($source);
-            if (!$source instanceof \GdImage) {
-                throw new \Exception('Failed to apply frame to image resource.');
-            }
-        }
-
-        if ($config['print']['qrcode']) {
-            $url = $config['qr']['url'];
-            if ($config['ftp']['enabled'] && $config['ftp']['useForQr']) {
-                $remoteStorageService = RemoteStorageService::getInstance();
-                $url = $remoteStorageService->getWebpageUri();
-                if ($config['qr']['append_filename']) {
-                    $url .= '/?photo=';
-                }
-            }
-            if ($config['qr']['append_filename']) {
-                $url .= $vars['fileName'];
-            }
-            $imageHandler->qrUrl = PathUtility::getPublicPath($url, true);
-            $imageHandler->qrSize = $config['print']['qrSize'];
-            $imageHandler->qrMargin = $config['print']['qrMargin'];
-            $imageHandler->qrColor = $config['print']['qrBgColor'];
-            $imageHandler->qrOffset = $config['print']['qrOffset'];
-            $imageHandler->qrPosition = $config['print']['qrPosition'];
-
-            $qrCode = $imageHandler->createQr();
-            if (!$qrCode instanceof \GdImage) {
-                throw new \Exception('Cannot create QR Code resource.');
-            }
-            $source = $imageHandler->applyQr($qrCode, $source);
-            if (!$source instanceof \GdImage) {
-                throw new \Exception('Cannot apply QR Code to image resource.');
-            }
-            unset($qrCode);
-        }
-
-        if ($config['textonprint']['enabled']) {
-            $imageHandler->fontSize = $config['textonprint']['font_size'];
-            $imageHandler->fontRotation = $config['textonprint']['rotation'];
-            $imageHandler->fontLocationX = $config['textonprint']['locationx'];
-            $imageHandler->fontLocationY = $config['textonprint']['locationy'];
-            $imageHandler->fontColor = $config['textonprint']['font_color'];
-            $imageHandler->fontPath = $config['textonprint']['font'];
-            $imageHandler->textLine1 = $config['textonprint']['line1'];
-            $imageHandler->textLine2 = $config['textonprint']['line2'];
-            $imageHandler->textLine3 = $config['textonprint']['line3'];
-            $imageHandler->textLineSpacing = $config['textonprint']['linespace'];
-
-            $source = $imageHandler->applyText($source);
-            if (!$source instanceof \GdImage) {
-                throw new \Exception('Failed to apply text to image resource.');
-            }
-        }
-
-        if ($config['print']['crop']) {
-            $source = $imageHandler->resizeCropImage($source, $config['print']['crop_width'], $config['print']['crop_height']);
-            if (!$source instanceof \GdImage) {
-                throw new \Exception('Failed to crop image resource.');
-            }
-        }
+        $source = PrintImageUtility::render($imageHandler, $source, $config, $vars['fileName']);
 
         if ($processor !== null && $processor instanceof PrintProcessor && method_exists($processor, 'postProcessing')) {
             [$imageHandler, $vars, $config, $source] = $processor->postProcessing($imageHandler, $vars, $config, $source);

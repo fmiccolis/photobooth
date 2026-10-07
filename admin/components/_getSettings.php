@@ -37,7 +37,8 @@ foreach ($configsetup as $section => $fields) {
 
         $i18ntag = $section . ':' . $key;
         echo '<!-- ' . strtoupper($setting['type']) . ' ' . strtoupper($setting['name']) . ' -->';
-        echo '<div class="adminSettingCard relative flex flex-col rounded-xl p-3 shadow-xl bg-white ' . $hidden . '" id="' . $i18ntag . '">';
+        $span = $setting['type'] === 'print-preview' ? 'md:col-span-2 md:row-span-3' : '';
+        echo '<div class="adminSettingCard relative flex flex-col rounded-xl p-3 shadow-xl bg-white ' . $span . ' ' . $hidden . '" id="' . $i18ntag . '">';
 
         $isThemeField = ($setting['data-theme-field'] ?? '') === 'true' || ($setting['data-theme-field'] ?? false) === true;
         AdminInput::setThemeFieldFlag($isThemeField);
@@ -88,6 +89,9 @@ foreach ($configsetup as $section => $fields) {
                 break;
             case 'list':
                 echo AdminInput::renderList($setting, $i18ntag);
+                break;
+            case 'print-preview':
+                echo AdminInput::renderPrintPreview($setting, $i18ntag);
                 break;
             case 'theme':
                 echo AdminInput::renderTheme($setting, 'theme_title');

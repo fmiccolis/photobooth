@@ -57,6 +57,30 @@ class AdminInput
         return '<input type="hidden" name="' . $setting['name'] . '" value="' . $setting['value'] . '"/>';
     }
 
+    public static function renderPrintPreview(array $setting, string $label): string
+    {
+        $languageService = LanguageService::getInstance();
+        $translate = static fn (string $key): string => htmlspecialchars($languageService->translate($key), ENT_QUOTES);
+
+        return self::renderHeadline($label) . '
+            <div class="flex flex-col flex-1 gap-3" data-print-preview
+                data-label-loading="' . $translate('print_preview_loading') . '"
+                data-label-source="' . $translate('print_preview_source') . '"
+                data-label-size="' . $translate('print_preview_size') . '"
+                data-label-error="' . $translate('print_preview_error') . '">
+                <div class="relative flex flex-1 items-center justify-center w-full min-h-[240px] p-3 bg-gray-100 rounded-lg overflow-hidden">
+                    <img class="max-w-full max-h-[520px] object-contain shadow-lg" style="display: none" alt="" data-print-preview-image />
+                    <span class="absolute inset-0 flex items-center justify-center p-4 text-center text-sm text-gray-600 bg-gray-100/80" data-print-preview-status>' . $translate('print_preview_loading') . '</span>
+                </div>
+                <div class="text-xs text-gray-600 break-all" data-print-preview-info></div>
+                <ul class="text-xs text-amber-700 list-disc pl-4" style="display: none" data-print-preview-warnings></ul>
+                <button type="button" class="w-full h-10 rounded-full border-2 border-solid border-brand-1 text-brand-1 font-bold hover:bg-brand-1 hover:text-white transition" data-print-preview-refresh>
+                    ' . $translate('print_preview_refresh') . '
+                </button>
+            </div>
+        ';
+    }
+
     public static function renderInfo(array $setting, string $label): string
     {
         $value = htmlspecialchars((string) ($setting['value'] ?? ''), ENT_QUOTES);

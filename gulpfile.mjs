@@ -100,6 +100,7 @@ gulp.task('js-admin', function () {
       './assets/js/admin/videoSelect.js',
       './assets/js/admin/themes.js',
       './assets/js/admin/toast.js',
+      './assets/js/admin/printPreview.js',
     ])
     .pipe(concat('main.admin.js'))
     .pipe(babel({

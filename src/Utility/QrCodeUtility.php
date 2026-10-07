@@ -9,9 +9,30 @@ use Endroid\QrCode\Label\Margin\Margin;
 use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Writer\Result\ResultInterface;
+use Photobooth\Service\RemoteStorageService;
 
 class QrCodeUtility
 {
+    /**
+     * Returns the URL encoded into the QR code for the given image.
+     */
+    public static function getUrl(array $config, string $fileName): string
+    {
+        $url = $config['qr']['url'];
+        if ($config['ftp']['enabled'] && $config['ftp']['useForQr']) {
+            $remoteStorageService = RemoteStorageService::getInstance();
+            $url = $remoteStorageService->getWebpageUri();
+            if ($config['qr']['append_filename']) {
+                $url .= '/?photo=';
+            }
+        }
+        if ($config['qr']['append_filename']) {
+            $url .= $fileName;
+        }
+
+        return PathUtility::getPublicPath($url, true);
+    }
+
     public static function create(string $text, string $labelText = '', int $size = 300, int $margin = 15): ResultInterface
     {
         $builder = new Builder(

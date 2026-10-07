@@ -2,8 +2,6 @@
 
 /** @var array $config */
 
-use Photobooth\Service\RemoteStorageService;
-use Photobooth\Utility\PathUtility;
 use Photobooth\Utility\QrCodeUtility;
 
 require_once '../lib/boot.php';
@@ -16,18 +14,7 @@ if ($filename) {
         echo 'Invalid filename.';
         exit();
     }
-    $url = $config['qr']['url'];
-    if ($config['ftp']['enabled'] && $config['ftp']['useForQr']) {
-        $remoteStorageService = RemoteStorageService::getInstance();
-        $url = $remoteStorageService->getWebpageUri();
-        if ($config['qr']['append_filename']) {
-            $url .= '/?photo=';
-        }
-    }
-    if ($config['qr']['append_filename']) {
-        $url .= $filename;
-    }
-    $url = PathUtility::getPublicPath($url, true);
+    $url = QrCodeUtility::getUrl($config, $filename);
     try {
         $result = QrCodeUtility::create($url);
         header('Content-Type: ' . $result->getMimeType());

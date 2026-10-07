@@ -2054,6 +2054,12 @@ return [
             'data-theme-field' => 'true',
             'value' => $config['print']['qrcode'],
         ],
+        'print_preview' => [
+            'view' => 'advanced',
+            'type' => 'print-preview',
+            'name' => 'print_preview',
+            'value' => '',
+        ],
         'print_qrSize' => [
             'view' => 'advanced',
             'type' => 'range',
@@ -2079,9 +2085,9 @@ return [
                 'bottomRight' => 'bottom right',
                 'bottom' => 'bottom',
                 'bottomLeft' => 'bottom left',
-                'data-theme-field' => 'true',
                 'left' => 'left',
             ],
+            'data-theme-field' => 'true',
             'value' => $config['print']['qrPosition'],
         ],
         'print_qrOffset' => [
