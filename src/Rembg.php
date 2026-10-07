@@ -277,10 +277,16 @@ class Rembg
             throw new \Exception('Failed to save original preview.');
         }
 
-        $cutout = self::removeBackground($imageResource, $config['rembg']);
-        imagesavealpha($cutout, true);
-        if (!imagepng($cutout, self::getCutoutFile($fileName), 1)) {
-            throw new \Exception('Failed to save cutout.');
+        try {
+            $cutout = self::removeBackground($imageResource, $config['rembg']);
+            imagesavealpha($cutout, true);
+            if (!imagepng($cutout, self::getCutoutFile($fileName), 1)) {
+                throw new \Exception('Failed to save cutout.');
+            }
+        } catch (\Exception $e) {
+            // don't leave the original preview behind when the selection can't be offered
+            self::deleteCutout($fileName);
+            throw $e;
         }
     }
 
