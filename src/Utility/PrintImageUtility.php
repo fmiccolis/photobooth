@@ -12,9 +12,10 @@ use Photobooth\Image;
 class PrintImageUtility
 {
     /**
-     * Smallest QR code size in pixels for the 'custom' position, below it phones can't scan it anymore.
+     * Smallest QR code size in pixels for the 'custom' position: about 2 pixels per module for the
+     * usual URLs (33-41 modules), below it phones can't scan it anymore.
      */
-    public const QR_MIN_PIXEL_SIZE = 32;
+    public const QR_MIN_PIXEL_SIZE = 100;
 
     /**
      * Applies the print layout configured in the print and textonprint sections to the source image.

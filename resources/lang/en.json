@@ -702,7 +702,7 @@
   "manual:print:print_print_frame": "If enabled, a frame is applied on your picture at print.",
   "manual:print:print_qrBgColor": "Define the background color of the qrcode (will replace the default white background).",
   "manual:print:print_qrcode": "If enabled, a QR Code is printed onto the right side of the picture while printing.",
-  "manual:print:print_qrMargin": "Define the margin size outside the qrcode (4 is recommended).",
+  "manual:print:print_qrMargin": "Border around the QR Code, in the QR Code background color, in percent of the QR Code size. 0 = no border. Keep at least 4 if the QR Code is printed on a dark or busy area of the picture, phones need a light border to scan it.",
   "manual:print:print_qrOffset": "Define an offset value (px) the QR Code is placed away from the edges of the picture. Not used with the \"custom\" position.",
   "manual:print:print_qrPosition": "QR Code position. With \"custom\" the QR Code is placed freely using the X/Y position and the size in percent, which you can also set by dragging it on the print preview.",
   "manual:print:print_qrScale": "Size of the QR Code in percent of the short side of the print, used with the \"custom\" position. It adapts to any picture resolution.",

@@ -2,6 +2,7 @@
 
 namespace Photobooth;
 
+use Endroid\QrCode\RoundBlockSizeMode;
 use GdImage;
 use Photobooth\Service\ImageMetadataCacheService;
 use Photobooth\Utility\FontUtility;
@@ -1226,13 +1227,32 @@ class Image
                 throw new \Exception('QR-Size must be in range between 0 and 10.');
             }
 
-            $margin = (int)($size / 100 * $this->qrMargin);
-            $result = QrCodeUtility::create($this->qrUrl, '', $size, $margin);
-            $qrCodeImage = imagecreatefromstring($result->getString());
+            $margin = (int) round($size / 100 * $this->qrMargin);
+            $codeSize = $size - 2 * $margin;
 
-            if (!$qrCodeImage) {
+            // Generate the code with one pixel per module and scale it to the exact code size: modules stay
+            // sharp (whole pixels, at most 1px of difference between them) and the margin is exactly the
+            // configured one, instead of absorbing the rounding of the module size.
+            $result = QrCodeUtility::create($this->qrUrl, '', 1, 0, RoundBlockSizeMode::Enlarge);
+            $code = imagecreatefromstring($result->getString());
+            if (!$code) {
                 throw new \Exception('Failed to create image from QR code.');
             }
+            $modules = imagesx($code);
+            if ($codeSize < $modules) {
+                throw new \Exception('QR-Code too small: ' . $codeSize . 'px for ' . $modules . ' modules.');
+            }
+
+            $qrCodeImage = imagecreatetruecolor($size, $size);
+            if (!$qrCodeImage) {
+                throw new \Exception('Failed to create image for QR code.');
+            }
+            imagefill($qrCodeImage, 0, 0, intval(imagecolorallocate($qrCodeImage, 255, 255, 255)));
+            // imagecopyresized() doesn't interpolate, every pixel keeps the color of its module
+            if (!imagecopyresized($qrCodeImage, $code, $margin, $margin, 0, 0, $codeSize, $codeSize, $modules, $modules)) {
+                throw new \Exception('Failed to scale QR code.');
+            }
+            unset($code);
 
             if ($this->qrRotate) {
                 if (!imagerotate($qrCodeImage, 90, 0)) {

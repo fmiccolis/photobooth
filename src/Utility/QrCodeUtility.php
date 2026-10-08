@@ -33,7 +33,7 @@ class QrCodeUtility
         return PathUtility::getPublicPath($url, true);
     }
 
-    public static function create(string $text, string $labelText = '', int $size = 300, int $margin = 15): ResultInterface
+    public static function create(string $text, string $labelText = '', int $size = 300, int $margin = 15, RoundBlockSizeMode $roundBlockSizeMode = RoundBlockSizeMode::Margin): ResultInterface
     {
         $builder = new Builder(
             writer: new PngWriter(),
@@ -44,7 +44,7 @@ class QrCodeUtility
             errorCorrectionLevel: ErrorCorrectionLevel::Medium,
             size: $size - (2 * $margin),
             margin: $margin,
-            roundBlockSizeMode: RoundBlockSizeMode::Margin,
+            roundBlockSizeMode: $roundBlockSizeMode,
             labelText: $labelText,
             labelMargin: new Margin(0, $margin, $margin, $margin)
         );
