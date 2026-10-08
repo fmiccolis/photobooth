@@ -894,6 +894,7 @@
   "print_preview_loading": "Generazione anteprima...",
   "print_preview_note_demo": "Non è disponibile l'originale degli ultimi scatti, viene usata una foto demo: le dimensioni possono essere diverse da quelle della fotocamera. Tieni attiva l'opzione \"Mantieni le immagini originali nella cartella tmp\" in Immagini e scatta una foto per vedere l'anteprima con la tua fotocamera.",
   "print_preview_note_rembg": "La rimozione dello sfondo (rembg) non viene simulata nell'anteprima.",
+  "print_preview_ratio": "Proporzioni",
   "print_preview_refresh": "Aggiorna anteprima",
   "print_preview_size": "Dimensione stampa",
   "print_preview_source": "Foto",

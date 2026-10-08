@@ -950,6 +950,7 @@
   "print_preview_loading": "Generating preview...",
   "print_preview_note_demo": "No original of the latest pictures is available, a demo picture is used: its size may differ from the camera. Keep \"Keep original images in tmp folder\" enabled in Pictures and take a picture to preview with your camera.",
   "print_preview_note_rembg": "The background removal (rembg) is not simulated in the preview.",
+  "print_preview_ratio": "Aspect ratio",
   "print_preview_refresh": "Refresh preview",
   "print_preview_size": "Print size",
   "print_preview_source": "Picture",

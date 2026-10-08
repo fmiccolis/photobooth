@@ -67,6 +67,7 @@ class AdminInput
                 data-label-loading="' . $translate('print_preview_loading') . '"
                 data-label-source="' . $translate('print_preview_source') . '"
                 data-label-size="' . $translate('print_preview_size') . '"
+                data-label-ratio="' . $translate('print_preview_ratio') . '"
                 data-label-source-original="' . $translate('print_preview_source_original') . '"
                 data-label-source-demo="' . $translate('print_preview_source_demo') . '"
                 data-label-note-demo="' . $translate('print_preview_note_demo') . '"

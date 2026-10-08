@@ -67,6 +67,43 @@ $(function () {
         );
     }
 
+    // Pixel sizes rarely reduce to a readable fraction (1280 × 852 is 320:213): name the nearest common
+    // photo/paper ratio when it's within 1%, and always show the decimal value.
+    function formatAspectRatio(width, height) {
+        const landscape = width >= height;
+        const ratios = [
+            [1, 1],
+            [5, 4],
+            [4, 3],
+            [7, 5],
+            [3, 2],
+            [16, 10],
+            [16, 9],
+            [2, 1]
+        ].map(function (ratio) {
+            return {
+                value: ratio[0] / ratio[1],
+                name: landscape ? ratio[0] + ':' + ratio[1] : ratio[1] + ':' + ratio[0]
+            };
+        });
+        // A4, A5, A6... paper
+        ratios.push({ value: Math.SQRT2, name: 'ISO A' });
+
+        const value = Math.max(width, height) / Math.min(width, height);
+        const decimal = landscape ? value.toFixed(2) + ':1' : '1:' + value.toFixed(2);
+        let match = null;
+        let matchDistance = 0.01;
+        ratios.forEach(function (ratio) {
+            const distance = Math.abs(value / ratio.value - 1);
+            if (distance <= matchDistance) {
+                match = ratio;
+                matchDistance = distance;
+            }
+        });
+
+        return match ? match.name + ' (' + decimal + ')' : decimal;
+    }
+
     function collectFormData() {
         const data = new FormData();
         // Only the print layout sections are sent: the preview reflects unsaved changes.
@@ -276,6 +313,10 @@ $(function () {
                     ' × ' +
                     data.height +
                     ' px · ' +
+                    container.dataset.labelRatio +
+                    ': ' +
+                    formatAspectRatio(data.width, data.height) +
+                    ' · ' +
                     container.dataset.labelSource +
                     ': ' +
                     data.source +
