@@ -75,8 +75,8 @@ class AdminInput
                 <div class="relative flex flex-1 items-center justify-center w-full min-h-[240px] p-3 bg-gray-100 rounded-lg overflow-hidden">
                     <div class="relative max-w-full shadow-lg" style="display: none" data-print-preview-stage>
                         <img class="block max-w-full max-h-[520px] select-none" draggable="false" alt="" data-print-preview-image />
-                        <div class="absolute box-border cursor-move touch-none outline-none" style="display: none; border: 2px dashed var(--brand-1, #1B3FAA); background: rgba(255, 255, 255, 0.15)" tabindex="0" title="' . $translate('print_preview_drag_hint') . '" data-print-preview-qr>
-                            <span class="absolute w-4 h-4 rounded-full border-2 border-white cursor-nwse-resize touch-none" style="right: -9px; bottom: -9px; background: var(--brand-1, #1B3FAA)" data-print-preview-qr-resize></span>
+                        <div class="absolute box-border cursor-move touch-none outline-none" style="display: none; border: 2px dashed transparent; background: transparent; transition: border-color 0.3s, background-color 0.3s" tabindex="0" title="' . $translate('print_preview_drag_hint') . '" data-print-preview-qr>
+                            <span class="absolute w-4 h-4 rounded-full border-2 border-white cursor-nwse-resize touch-none" style="right: -9px; bottom: -9px; background: var(--brand-1, #1B3FAA); opacity: 0; transition: opacity 0.3s" data-print-preview-qr-resize></span>
                         </div>
                     </div>
                     <span class="absolute inset-0 flex items-center justify-center p-4 text-center text-sm text-gray-600 bg-gray-100/80" data-print-preview-status>' . $translate('print_preview_loading') . '</span>

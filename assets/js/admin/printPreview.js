@@ -27,13 +27,17 @@ $(function () {
     const fieldPattern = /^(picture|textonpicture|filters|print|textonprint)\[/;
     const debounceDelay = 500;
     const keyboardStep = 0.5;
+    const outlineIdleDelay = 5000;
+    const outlineColor = 'var(--brand-1, #1B3FAA)';
 
     let debounceTimer = null;
+    let outlineTimer = null;
     let controller = null;
     let initialized = false;
     let print = null;
     let qr = null;
     let dragging = false;
+    let outlineShownOnce = false;
 
     function showStatus(text) {
         status.textContent = text;
@@ -79,12 +83,44 @@ $(function () {
         return data;
     }
 
+    // The outline and the resize handle are only shown while the QR code is used: dragging and
+    // resizing always work, the outline just doesn't stay in the way when looking at the preview.
+    function setOutlineVisible(visible) {
+        qrBox.style.borderColor = visible ? outlineColor : 'transparent';
+        qrBox.style.backgroundColor = visible ? 'rgba(255, 255, 255, 0.15)' : 'transparent';
+        resizeHandle.style.opacity = visible ? '1' : '0';
+    }
+
+    function showOutline() {
+        if (qr === null) {
+            return;
+        }
+        setOutlineVisible(true);
+        clearTimeout(outlineTimer);
+        outlineTimer = setTimeout(hideOutline, outlineIdleDelay);
+    }
+
+    function hideOutline() {
+        clearTimeout(outlineTimer);
+        if (dragging) {
+            return;
+        }
+        setOutlineVisible(false);
+    }
+
     function placeQrBox() {
         const visible = qr !== null;
         qrBox.style.display = visible ? '' : 'none';
         hint.style.display = visible ? '' : 'none';
         if (!visible) {
             return;
+        }
+        // On the first preview show where the QR code can be dragged, if it's freely placed
+        if (!outlineShownOnce) {
+            outlineShownOnce = true;
+            if (fields.position && fields.position.value === 'custom') {
+                showOutline();
+            }
         }
         qrBox.style.left = qr.x + '%';
         qrBox.style.top = qr.y + '%';
@@ -137,15 +173,17 @@ $(function () {
     }
 
     function startDrag(event) {
-        if (qr === null || event.button !== 0) {
+        const rect = stage.getBoundingClientRect();
+        if (qr === null || event.button !== 0 || rect.width === 0 || rect.height === 0) {
             return;
         }
         event.preventDefault();
         qrBox.focus();
         dragging = true;
+        clearTimeout(outlineTimer);
+        setOutlineVisible(true);
 
         const resize = event.target === resizeHandle;
-        const rect = stage.getBoundingClientRect();
         const start = { x: event.clientX, y: event.clientY, qr: Object.assign({}, qr) };
         const startSize = (start.qr.width / 100) * rect.width;
         const minSize = (qr.minScale / 100) * Math.min(rect.width, rect.height);
@@ -178,6 +216,7 @@ $(function () {
             if (qr.x !== start.qr.x || qr.y !== start.qr.y || qr.width !== start.qr.width) {
                 commitQrBox();
             }
+            showOutline();
         }
 
         qrBox.addEventListener('pointermove', onMove);
@@ -196,6 +235,7 @@ $(function () {
         qr.y = clamp(qr.y + moves[event.key][1] * step, 0, 100 - qr.height);
         placeQrBox();
         commitQrBox();
+        showOutline();
     }
 
     function refresh() {
@@ -270,12 +310,25 @@ $(function () {
         }
     });
     if (fields.position) {
-        fields.position.addEventListener('change', highlightPositionFields);
+        fields.position.addEventListener('change', function () {
+            highlightPositionFields();
+            // A preset position is not placed by hand: hide the outline right away
+            if (fields.position.value !== 'custom') {
+                hideOutline();
+            }
+        });
     }
     highlightPositionFields();
 
     qrBox.addEventListener('pointerdown', startDrag);
     qrBox.addEventListener('keydown', moveWithKeyboard);
+    // Pointing at the QR code or focusing it shows the outline again, it hides after some idle time
+    qrBox.addEventListener('pointermove', function () {
+        if (!dragging) {
+            showOutline();
+        }
+    });
+    qrBox.addEventListener('focus', showOutline);
     refreshButton.addEventListener('click', refresh);
 
     // Render the first preview only once the card is visible, building it is not free on a Pi.
