@@ -67,6 +67,10 @@ class AdminInput
                 data-label-loading="' . $translate('print_preview_loading') . '"
                 data-label-source="' . $translate('print_preview_source') . '"
                 data-label-size="' . $translate('print_preview_size') . '"
+                data-label-source-original="' . $translate('print_preview_source_original') . '"
+                data-label-source-demo="' . $translate('print_preview_source_demo') . '"
+                data-label-note-demo="' . $translate('print_preview_note_demo') . '"
+                data-label-note-rembg="' . $translate('print_preview_note_rembg') . '"
                 data-label-error="' . $translate('print_preview_error') . '">
                 <div class="relative flex flex-1 items-center justify-center w-full min-h-[240px] p-3 bg-gray-100 rounded-lg overflow-hidden">
                     <div class="relative max-w-full shadow-lg" style="display: none" data-print-preview-stage>
@@ -79,6 +83,7 @@ class AdminInput
                 </div>
                 <div class="text-xs text-gray-600" style="display: none" data-print-preview-hint>' . $translate('print_preview_drag_hint') . '</div>
                 <div class="text-xs text-gray-600 break-all" data-print-preview-info></div>
+                <ul class="text-xs text-gray-600 list-disc pl-4" style="display: none" data-print-preview-notes></ul>
                 <ul class="text-xs text-amber-700 list-disc pl-4" style="display: none" data-print-preview-warnings></ul>
                 <button type="button" class="w-full h-10 rounded-full border-2 border-solid border-brand-1 text-brand-1 font-bold hover:bg-brand-1 hover:text-white transition" data-print-preview-refresh>
                     ' . $translate('print_preview_refresh') . '

@@ -14,6 +14,7 @@ $(function () {
     const hint = container.querySelector('[data-print-preview-hint]');
     const status = container.querySelector('[data-print-preview-status]');
     const info = container.querySelector('[data-print-preview-info]');
+    const notes = container.querySelector('[data-print-preview-notes]');
     const warnings = container.querySelector('[data-print-preview-warnings]');
     const refreshButton = container.querySelector('[data-print-preview-refresh]');
     const fields = {
@@ -22,7 +23,8 @@ $(function () {
         y: form.querySelector('[name="print[qrY]"]'),
         scale: form.querySelector('[name="print[qrScale]"]')
     };
-    const fieldPattern = /^(print|textonprint)\[/;
+    // Sections which change how a new picture is processed and printed
+    const fieldPattern = /^(picture|textonpicture|filters|print|textonprint)\[/;
     const debounceDelay = 500;
     const keyboardStep = 0.5;
 
@@ -38,14 +40,27 @@ $(function () {
         status.style.display = text ? '' : 'none';
     }
 
-    function showWarnings(list) {
-        warnings.innerHTML = '';
-        (list || []).forEach(function (warning) {
+    function showList(element, list) {
+        element.innerHTML = '';
+        (list || []).forEach(function (text) {
             const item = document.createElement('li');
-            item.textContent = warning;
-            warnings.appendChild(item);
+            item.textContent = text;
+            element.appendChild(item);
         });
-        warnings.style.display = warnings.children.length ? '' : 'none';
+        element.style.display = element.children.length ? '' : 'none';
+    }
+
+    function showWarnings(list) {
+        showList(warnings, list);
+    }
+
+    function showNotes(codes) {
+        showList(
+            notes,
+            (codes || []).map(function (code) {
+                return container.getAttribute('data-label-note-' + code) || code;
+            })
+        );
     }
 
     function collectFormData() {
@@ -223,7 +238,11 @@ $(function () {
                     ' px · ' +
                     container.dataset.labelSource +
                     ': ' +
-                    data.source;
+                    data.source +
+                    ' (' +
+                    (container.getAttribute('data-label-source-' + data.sourceType) || data.sourceType) +
+                    ')';
+                showNotes(data.notes);
                 showWarnings(data.warnings);
                 showStatus('');
             })
@@ -231,6 +250,7 @@ $(function () {
                 if (error.name === 'AbortError') {
                     return;
                 }
+                showNotes([]);
                 showWarnings([]);
                 showStatus(container.dataset.labelError + (error.message ? ': ' + error.message : ''));
             });

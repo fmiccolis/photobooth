@@ -15,6 +15,7 @@ use Photobooth\Service\LoggerService;
 use Photobooth\Service\RemoteStorageQueueService;
 use Photobooth\Utility\ImageUtility;
 use Photobooth\Utility\PathUtility;
+use Photobooth\Utility\PictureImageUtility;
 
 header('Content-Type: application/json');
 
@@ -226,31 +227,8 @@ try {
                     }
                 }
 
-                if ($config['picture']['polaroid_effect']) {
-                    $imageHandler->polaroidRotation = $config['picture']['polaroid_rotation'];
-                    $imageResource = $imageHandler->effectPolaroid($imageResource);
-                    if (!$imageResource instanceof \GdImage) {
-                        throw new \Exception('Error applying polaroid effect.');
-                    }
-                }
-
-                if (($config['picture']['take_frame'] && !$vars['isCollage']) || ($vars['editSingleCollage'] && ($config['collage']['take_frame'] === 'always' || $config['collage']['take_frame'] !== 'always' && $config['picture']['take_frame']))) {
-                    if (!$vars['isCollage'] || $config['collage']['take_frame'] !== 'always') {
-                        $imageHandler->frameExtend = $config['picture']['extend_by_frame'];
-                        if ($config['picture']['extend_by_frame']) {
-                            $imageHandler->frameExtendLeft = $config['picture']['frame_left_percentage'];
-                            $imageHandler->frameExtendRight = $config['picture']['frame_right_percentage'];
-                            $imageHandler->frameExtendBottom = $config['picture']['frame_bottom_percentage'];
-                            $imageHandler->frameExtendTop = $config['picture']['frame_top_percentage'];
-                        }
-                    } else {
-                        $imageHandler->frameExtend = false;
-                    }
-                    $imageResource = $imageHandler->applyFrame($imageResource);
-                    if (!$imageResource instanceof \GdImage) {
-                        throw new \Exception('Error applying frame to image resource.');
-                    }
-                }
+                $imageResource = PictureImageUtility::applyPolaroid($imageHandler, $imageResource, $config);
+                $imageResource = PictureImageUtility::applyFrame($imageHandler, $imageResource, $config, $vars['isCollage'], $vars['editSingleCollage']);
 
                 // Maybe we want this later or configurable, will take some time to process upscale again
                 // Upscale back to original size
@@ -294,21 +272,7 @@ try {
                 $scale        = $currentWidth / $originalWidth;
             }
 
-            // Cast after scaling to avoid implicit float-to-int deprecation warnings in PHP 8.4
-            $imageHandler->fontSize        = (int) round($config['textonpicture']['font_size'] * $scale);
-            $imageHandler->textLineSpacing = (int) round($config['textonpicture']['linespace'] * $scale);
-            $imageHandler->fontLocationX   = (int) round($config['textonpicture']['locationx'] * $scale);
-            $imageHandler->fontLocationY   = (int) round($config['textonpicture']['locationy'] * $scale);
-            $imageHandler->fontRotation = $config['textonpicture']['rotation'];
-            $imageHandler->fontColor = $config['textonpicture']['font_color'];
-            $imageHandler->fontPath = $config['textonpicture']['font'];
-            $imageHandler->textLine1 = $config['textonpicture']['line1'];
-            $imageHandler->textLine2 = $config['textonpicture']['line2'];
-            $imageHandler->textLine3 = $config['textonpicture']['line3'];
-            $imageResource = $imageHandler->applyText($imageResource);
-            if (!$imageResource instanceof \GdImage) {
-                throw new \Exception('Error applying text to image resource.');
-            }
+            $imageResource = PictureImageUtility::applyText($imageHandler, $imageResource, $config, $scale);
         }
 
         // image scale, create thumbnail

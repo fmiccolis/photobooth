@@ -6,11 +6,13 @@ require_once __DIR__ . '/../admin/admin_boot.php';
 
 use Photobooth\Configuration\PhotoboothConfiguration;
 use Photobooth\Enum\FolderEnum;
+use Photobooth\Enum\ImageFilterEnum;
 use Photobooth\Image;
 use Photobooth\Service\DatabaseManagerService;
 use Photobooth\Service\LoggerService;
 use Photobooth\Utility\ArrayUtility;
 use Photobooth\Utility\PathUtility;
+use Photobooth\Utility\PictureImageUtility;
 use Photobooth\Utility\PrintImageUtility;
 use Symfony\Component\Config\Definition\Processor;
 
@@ -24,13 +26,14 @@ checkCsrfOrFail($_POST);
 
 $previewMaxSize = 1200;
 $demoImage = 'resources/img/demo/seal-station-norddeich-01.jpg';
+$latestPicturesToCheck = 20;
 
 try {
     // Apply the (unsaved) values of the admin form on top of the current configuration,
-    // only for the sections which define the print layout.
+    // only for the sections which define how a picture is processed and printed.
     $data = ArrayUtility::replaceBooleanValues($_POST);
     $override = [];
-    foreach (['print', 'textonprint'] as $section) {
+    foreach (['picture', 'textonpicture', 'filters', 'print', 'textonprint'] as $section) {
         if (isset($data[$section]) && is_array($data[$section])) {
             $override[$section] = ArrayUtility::mergeRecursive($config[$section], $data[$section]);
         }
@@ -41,6 +44,13 @@ try {
             $config[$section] = $processed[$section];
         }
     }
+    // Same defaults as ConfigurationService::addDefaults()
+    if (empty($config['picture']['frame'])) {
+        $config['picture']['frame'] = 'api/randomImg.php?dir=demoframes';
+    }
+    if (empty($config['textonpicture']['font'])) {
+        $config['textonpicture']['font'] = 'resources/fonts/GreatVibes-Regular.ttf';
+    }
     if (empty($config['print']['frame'])) {
         $config['print']['frame'] = 'resources/img/frames/frame.png';
     }
@@ -48,21 +58,33 @@ try {
         $config['textonprint']['font'] = 'resources/fonts/GreatVibes-Regular.ttf';
     }
 
-    // Preview with the latest picture taken, so size and orientation match the real prints.
+    // Simulate a new picture: start from the original of the latest picture taken, kept in
+    // data/tmp with picture[keep_original], so camera resolution and orientation are the real ones.
+    $notes = [];
     $fileName = '';
     $sourceFile = '';
-    $images = DatabaseManagerService::getInstance()->getContentFromDB();
+    $sourceType = 'original';
+    $images = array_slice(DatabaseManagerService::getInstance()->getContentFromDB(), -$latestPicturesToCheck);
     foreach (array_reverse($images) as $image) {
-        $candidate = FolderEnum::IMAGES->absolute() . DIRECTORY_SEPARATOR . basename((string) $image);
-        if (is_file($candidate)) {
-            $fileName = basename($candidate);
-            $sourceFile = $candidate;
-            break;
+        $name = basename((string) $image);
+        $tmpBase = FolderEnum::TEMP->absolute() . DIRECTORY_SEPARATOR;
+        // On collages the temporary file is the collage itself, the first single picture is the original
+        foreach ([$tmpBase . substr($name, 0, -4) . '-0.jpg', $tmpBase . $name] as $candidate) {
+            if (is_file($candidate)) {
+                $fileName = $name;
+                $sourceFile = $candidate;
+                break 2;
+            }
         }
     }
     if ($sourceFile === '') {
+        $notes[] = 'demo';
+        $sourceType = 'demo';
         $fileName = basename($demoImage);
         $sourceFile = PathUtility::getAbsolutePath($demoImage);
+    }
+    if ($config['rembg']['enabled']) {
+        $notes[] = 'rembg';
     }
 
     $imageHandler = new Image();
@@ -71,6 +93,12 @@ try {
     if (!$source instanceof \GdImage) {
         throw new \Exception('Cannot load image ' . $fileName . '.');
     }
+    // The guest interface always sends the default filter when taking a picture
+    $filter = $config['filters']['defaults'];
+    if (!$filter instanceof ImageFilterEnum) {
+        $filter = ImageFilterEnum::tryFrom((string) $filter);
+    }
+    $source = PictureImageUtility::render($imageHandler, $source, $config, $filter);
     $source = PrintImageUtility::render($imageHandler, $source, $config, $fileName);
     $printWidth = imagesx($source);
     $printHeight = imagesy($source);
@@ -109,6 +137,8 @@ try {
         'width' => $printWidth,
         'height' => $printHeight,
         'source' => $fileName,
+        'sourceType' => $sourceType,
+        'notes' => $notes,
         'qr' => $qr,
         // Steps which failed silently and would be skipped on the real print as well
         'warnings' => array_values(array_map(static fn ($error): string => is_array($error) ? (string) json_encode($error) : (string) $error, $imageHandler->errorLog)),
