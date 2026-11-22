@@ -406,7 +406,8 @@ Legacy settings are migrated automatically when loading the configuration. Expli
 | `baseURL`                              | `host`                                                              |
 | `baseFolder` + `folder` + title folder | `path`, e.g. `<baseFolder>/<folder>/%title%`                        |
 | `website` + `urlTemplate`              | `url`, e.g. `<website>/<folder>/%title%`                            |
-| `useForQr`                             | `url` stays empty when disabled, preserving local QR codes |
+| `useForQr`                             | `url` stays empty when disabled, preserving local QR codes          |
+| `qr.append_filename` disabled          | `qr_link` empty, the QR code keeps linking to the gallery           |
 
 ---
 

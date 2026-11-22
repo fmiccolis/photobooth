@@ -10,7 +10,7 @@ use Symfony\Component\Config\Definition\Processor;
 
 final class ConfigurationMigrationTest extends TestCase
 {
-    private function migrate(array $ftp): array
+    private function migrate(array $ftp, array $qr = []): array
     {
         $service = new class () extends ConfigurationService {
             public function __construct()
@@ -22,7 +22,7 @@ final class ConfigurationMigrationTest extends TestCase
                 return $this->processMigration($config);
             }
         };
-        $migrated = $service->migrate(['ftp' => $ftp]);
+        $migrated = $service->migrate(['ftp' => $ftp] + ($qr === [] ? [] : ['qr' => $qr]));
         self::assertSame($migrated, $service->migrate($migrated));
 
         return (new Processor())->processConfiguration(new PhotoboothConfiguration(), [$migrated])['ftp'];
@@ -56,6 +56,19 @@ final class ConfigurationMigrationTest extends TestCase
         $legacy = ['baseURL' => 'ftp.example.org', 'website' => 'https://example.org', 'folder' => 'photos'];
         self::assertSame('', $this->migrate($legacy)['url']);
         self::assertSame('https://example.org/photos/%title%', $this->migrate($legacy + ['useForQr' => true])['url']);
+    }
+
+    public function testLegacyQrWithoutFilenameKeepsLinkingToTheGallery(): void
+    {
+        $legacy = ['baseURL' => 'ftp.example.org', 'website' => 'https://example.org', 'folder' => 'photos', 'title' => 'My Event', 'useForQr' => true];
+
+        $ftp = $this->migrate($legacy, ['append_filename' => false]);
+        self::assertSame('', $ftp['qr_link']);
+        self::assertSame('https://example.org/photos/my-event', (new RemoteStorageService($ftp))->getPhotoUrl('photo.jpg'));
+
+        self::assertSame('/images/%file%', $this->migrate($legacy, ['append_filename' => true])['qr_link']);
+        self::assertSame('/images/%file%', $this->migrate($legacy)['qr_link']);
+        self::assertSame('/?photo=%file%', $this->migrate($legacy + ['qr_link' => '/?photo=%file%'], ['append_filename' => false])['qr_link']);
     }
 
     public function testNewSettingsTakePrecedenceAndAreNotMigrated(): void

@@ -142,6 +142,13 @@ class ConfigurationService
                 $ftp['url'] ??= !empty($ftp['useForQr'])
                     ? str_replace(['%website%', '%folder%'], [$ftp['website'] ?? '', $ftp['folder'] ?? ''], $ftp['urlTemplate'] ?? '%website%/%folder%/%title%')
                     : '';
+                // The old remote QR link only got "/images/<file>" appended
+                // when qr.append_filename was enabled: keep linking to the
+                // gallery for installs that had it disabled.
+                $appendFilename = filter_var($config['qr']['append_filename'] ?? true, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                if (!empty($ftp['useForQr']) && $appendFilename === false) {
+                    $ftp['qr_link'] ??= '';
+                }
             }
             unset($ftp);
         }

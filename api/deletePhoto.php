@@ -67,6 +67,11 @@ $logData = [
 ImageMetadataCacheService::getInstance()->remove(FolderEnum::IMAGES->absolute() . DIRECTORY_SEPARATOR . $file);
 ImageMetadataCacheService::getInstance()->remove(FolderEnum::THUMBS->absolute() . DIRECTORY_SEPARATOR . $file);
 
+// Set after the first failed remote deletion: the server is most likely
+// unreachable, so the remaining files are not tried (each attempt can wait
+// for the full connection timeout).
+$remoteDeleteFailed = false;
+
 foreach ($filesToDelete as $fileName) {
     $delete = new FileDelete($fileName, $paths, (bool) $config['picture']['keep_original']);
     $delete->deleteFiles();
@@ -82,14 +87,23 @@ foreach ($filesToDelete as $fileName) {
     }
 
     if ($config['ftp']['enabled']) {
-        // Cancel a queued upload; if it already reached (or may reach) the
-        // remote storage, delete the remote copies as well. Entries removed
-        // while uploading are cleaned up by the drain worker itself.
+        // Cancel a queued upload and delete the remote copies as well: even
+        // pending and failed entries may already have a partially uploaded
+        // copy. An upload still in flight is undone by the drain worker.
         RemoteStorageQueueService::getInstance()->remove($fileName);
-        // Pending and failed entries may already have a partially uploaded copy.
-        if ($config['ftp']['delete']) {
-            $remoteStorage->delete($remoteStorage->getStorageFolder() . '/images/' . $fileName);
-            $remoteStorage->delete($remoteStorage->getStorageFolder() . '/thumbs/' . $fileName);
+        if ($config['ftp']['delete'] && !$remoteDeleteFailed) {
+            try {
+                $remoteStorage->delete($remoteStorage->getStorageFolder() . '/images/' . $fileName);
+                $remoteStorage->delete($remoteStorage->getStorageFolder() . '/thumbs/' . $fileName);
+            } catch (\Throwable $e) {
+                // The local deletion succeeded: a remote failure must not fail
+                // the request. The remote copy is left behind.
+                $remoteDeleteFailed = true;
+                LoggerService::getInstance()->getLogger('remotestorage')->error('Remote deletion failed, skipping the remaining files', [
+                    'file' => $fileName,
+                    'error' => RemoteStorageService::describeException($e),
+                ]);
+            }
         }
     }
 }
